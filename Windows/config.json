@@ -1,0 +1,58 @@
+{
+  "client_id": "1482692658504794289",
+  "update_interval": 15,
+  "show_window_title": true,
+  "show_process_name": true,
+  "custom_mappings": {
+    "Code.exe": {
+      "name": "Visual Studio Code",
+      "icon": "vscode",
+      "detail": "Đang code 💻"
+    },
+    "chrome.exe": {
+      "name": "Google Chrome",
+      "icon": "chrome",
+      "detail": "Đang lướt web 🌐"
+    },
+    "firefox.exe": {
+      "name": "Firefox",
+      "icon": "firefox",
+      "detail": "Đang lướt web 🦊"
+    },
+    "discord.exe": {
+      "name": "Discord",
+      "icon": "discord",
+      "detail": "Đang chat 💬"
+    },
+    "notepad.exe": {
+      "name": "Notepad",
+      "icon": "notepad",
+      "detail": "Đang viết 📝"
+    },
+    "explorer.exe": {
+      "name": "File Explorer",
+      "icon": "explorer",
+      "detail": "Đang xem file 📁"
+    },
+    "Photoshop.exe": {
+      "name": "Adobe Photoshop",
+      "icon": "photoshop",
+      "detail": "Đang edit ảnh 🎨"
+    },
+    "vlc.exe": {
+      "name": "VLC Media Player",
+      "icon": "vlc",
+      "detail": "Đang xem video 🎬"
+    },
+    "spotify.exe": {
+      "name": "Spotify",
+      "icon": "spotify",
+      "detail": "Đang nghe nhạc 🎵"
+    },
+    "steam.exe": {
+      "name": "Steam",
+      "icon": "steam",
+      "detail": "Đang chơi game 🎮"
+    }
+  }
+}

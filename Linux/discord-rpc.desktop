@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Discord RPC Watcher
+Comment=Discord Rich Presence for active window
+Exec=python3 /opt/discord-rpc/main.py
+Icon=discord
+Terminal=false
+Categories=Utility;
+StartupNotify=false
