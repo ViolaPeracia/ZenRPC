@@ -1,26 +1,26 @@
 # Discord RPC Watcher
 
-App chạy nền trên Windows, tự detect cửa sổ đang dùng và hiện lên Discord Rich Presence.
+A lightweight Windows tray app that detects your active window and displays it on Discord Rich Presence.
 
-## Yêu cầu
+## Requirements
 
 - Windows 10/11
 - Python 3.8+
-- Discord Desktop App (bản web/mobile không support RPC)
+- Discord Desktop App (web/mobile does not support RPC)
 
 ---
 
-## Cài đặt
+## Setup
 
-### Bước 1 — Tạo Discord Application
+### Step 1 � Create a Discord Application
 
-1. Vào https://discord.com/developers/applications
-2. Nhấn **New Application** → đặt tên bất kỳ (VD: "My PC")
-3. Copy **Application ID** (chính là Client ID)
+1. Go to https://discord.com/developers/applications
+2. Click **New Application** and give it a name (e.g. "My PC")
+3. Copy the **Application ID** (this is your Client ID)
 
-### Bước 2 — Điền Client ID
+### Step 2 � Set your Client ID
 
-M�� `config.json`, thay `YOUR_CLIENT_ID_HERE`:
+Open `config.json` and replace `YOUR_CLIENT_ID_HERE`:
 
 ```json
 {
@@ -28,74 +28,74 @@ M�� `config.json`, thay `YOUR_CLIENT_ID_HERE`:
 }
 ```
 
-### Bước 3 — Cài thư viện
+### Step 3 � Install dependencies
 
-Double-click `install.bat` → đợi cài xong.
+Double-click `install.bat` and wait for it to finish.
 
-### Bước 4 — Chạy
+### Step 4 � Run
 
-Double-click `run.bat` → icon tròn màu tím xuất hiện ở System Tray góc dưới phải.
+Double-click `run.bat`. A purple circle icon will appear in the System Tray (bottom right).
 
 ---
 
-## Cấu hình
+## Configuration
 
-Chỉnh `config.json` theo ý muốn:
+Edit `config.json` to customize behavior:
 
-| Key | Mô tả | Mặc định |
-|-----|-------|----------|
-| `client_id` | Application ID từ Discord Developer Portal | bắt buộc |
-| `update_interval` | Tần suất cập nhật (giây, tối thiểu 15) | `15` |
-| `reconnect_delay` | Thời gian chờ trước khi thử kết nối lại (giây) | `30` |
-| `show_window_title` | Hiện tiêu đề cửa sổ đang mở lên Discord | `true` |
-| `clear_on_idle` | Xóa presence khi không có window active | `true` |
-| `custom_mappings` | Map tên process → tên hiển thị + icon + detail | xem bên dưới |
+| Key | Description | Default |
+|-----|-------------|---------|
+| `client_id` | Application ID from Discord Developer Portal | required |
+| `update_interval` | How often to update presence (seconds, min 15) | `15` |
+| `reconnect_delay` | How long to wait before retrying connection (seconds) | `30` |
+| `show_window_title` | Show the active window title on Discord | `true` |
+| `clear_on_idle` | Clear presence when no window is active | `true` |
+| `custom_mappings` | Map process names to display info | see below |
 
-### Thêm app mới
+### Adding a new app
 
-M�� `config.json`, thêm vào `custom_mappings`:
+Add an entry to `custom_mappings` in `config.json`:
 
 ```json
 "obs64.exe": {
     "name": "OBS Studio",
     "icon": "obs",
-    "detail": "Dang stream"
+    "detail": "Streaming"
 }
 ```
 
-Tên key (`obs64.exe`) phải là tên process chính xác — tìm trong **Task Manager → tab Details**.
+The key (`obs64.exe`) must be the exact process name � find it in **Task Manager &#8594; Details tab**.
 
-Sau khi thêm, bấm **Reload config** từ tray menu để áp dụng ngay mà không cần restart.
+After editing, click **Reload config** from the tray menu to apply changes without restarting.
 
-### Thêm icon
+### Adding icons
 
-Discord RPC chỉ nhận icon đã upload lên **Art Assets** trong Developer Portal:
+Discord RPC only accepts icons uploaded to the **Art Assets** section of your Developer Portal:
 
-1. Vào https://discord.com/developers/applications → chọn app
-2. Sidebar → **Rich Presence** → **Art Assets**
-3. Upload ảnh PNG (khuyến nghị 512x512) → đặt tên key khớp với `"icon"` trong config
+1. Go to https://discord.com/developers/applications and select your app
+2. Sidebar &#8594; **Rich Presence** &#8594; **Art Assets**
+3. Upload a PNG image (512x512 recommended) and set the key name to match `"icon"` in your config
 
-Nguồn ảnh icon: https://simpleicons.org hoặc https://icon-icons.com
+Icon sources: https://simpleicons.org or https://icon-icons.com
 
 ---
 
 ## Tray Menu
 
-Chuột phải vào icon:
+Right-click the tray icon:
 
-| Menu | Chức năng |
-|------|-----------|
-| Bat/Tat RPC | Bật hoặc tắt RPC tạm thời |
-| Khoa app hien tai | Giữ nguyên app hiện tại dù chuyển sang cửa sổ khác |
-| Mo khoa | Quay về chế độ tự động theo dõi |
-| Reload config | Áp dụng thay đổi config mà không cần restart |
-| Mo config.json | Mở file config bằng Notepad |
-| Thoat | Đóng app hoàn toàn |
+| Option | Description |
+|--------|-------------|
+| Bat/Tat RPC | Toggle RPC on or off |
+| Khoa app hien tai | Lock current app � keeps showing it even when you switch windows |
+| Mo khoa | Unlock and return to auto-detect mode |
+| Reload config | Apply config changes without restarting |
+| Mo config.json | Open config file in Notepad |
+| Thoat | Exit the app |
 
-Khi đang lock, icon tray đổi sang **màu đỏ**.
+When locked, the tray icon turns **red**.
 
 ---
 
 ## License
 
-GPL v3 — xem file [LICENSE](LICENSE).
+This project is licensed under the GNU General Public License v3.0 � see the [LICENSE](LICENSE) file for details.
