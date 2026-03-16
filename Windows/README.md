@@ -94,6 +94,7 @@ Right-click the tray icon:
 
 When locked, the tray icon turns **red**.
 
+KIRXI
 ---
 
 ## License
