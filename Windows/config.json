@@ -1,5 +1,5 @@
 {
-  "client_id": "1482692658504794289",
+  "client_id": "YOUR_CLIENT_ID_HERE",
   "update_interval": 15,
   "show_window_title": true,
   "show_process_name": true,
@@ -7,52 +7,57 @@
     "Code.exe": {
       "name": "Visual Studio Code",
       "icon": "vscode",
-      "detail": "Đang code 💻"
+      "detail": "Editing code 💻"
     },
     "chrome.exe": {
       "name": "Google Chrome",
       "icon": "chrome",
-      "detail": "Đang lướt web 🌐"
+      "detail": "Browsing the web 🌐"
     },
     "firefox.exe": {
       "name": "Firefox",
       "icon": "firefox",
-      "detail": "Đang lướt web 🦊"
+      "detail": "Browsing the web 🦊"
     },
     "discord.exe": {
       "name": "Discord",
       "icon": "discord",
-      "detail": "Đang chat 💬"
+      "detail": "Chatting 💬"
     },
     "notepad.exe": {
       "name": "Notepad",
       "icon": "notepad",
-      "detail": "Đang viết 📝"
+      "detail": "Editing 📝"
     },
     "explorer.exe": {
       "name": "File Explorer",
       "icon": "explorer",
-      "detail": "Đang xem file 📁"
+      "detail": "Viewing files 📁"
     },
     "Photoshop.exe": {
       "name": "Adobe Photoshop",
       "icon": "photoshop",
-      "detail": "Đang edit ảnh 🎨"
+      "detail": "Editing images 🖌️"
     },
     "vlc.exe": {
       "name": "VLC Media Player",
       "icon": "vlc",
-      "detail": "Đang xem video 🎬"
+      "detail": "Viewing video 🎥"
     },
     "spotify.exe": {
       "name": "Spotify",
       "icon": "spotify",
-      "detail": "Đang nghe nhạc 🎵"
+      "detail": "Listening to music 🎵"
     },
     "steam.exe": {
       "name": "Steam",
       "icon": "steam",
-      "detail": "Đang chơi game 🎮"
+      "detail": "Playing games 🎮"
+    },
+    "zed.exe": {
+      "name": "Zed",
+      "icon": "zed",
+      "detail": "Editing code 💻"
     }
   }
 }

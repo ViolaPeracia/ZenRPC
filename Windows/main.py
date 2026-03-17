@@ -1,15 +1,16 @@
-import time
-import threading
-import sys
-import os
-import json
 import ctypes
+import json
+import os
+import sys
+import threading
+import time
+
+import psutil
 import win32gui
 import win32process
-import psutil
+from PIL import Image, ImageDraw
 from pypresence import Presence
 from pystray import Icon, Menu, MenuItem
-from PIL import Image, ImageDraw
 
 # ── Config ────────────────────────────────────────────────────────────────────
 CONFIG_FILE = "config.json"
@@ -20,17 +21,62 @@ DEFAULT_CONFIG = {
     "show_window_title": True,
     "clear_on_idle": True,
     "custom_mappings": {
-        "Code.exe":      {"name": "Visual Studio Code", "icon": "vscode",    "detail": "Dang code"},
-        "chrome.exe":    {"name": "Google Chrome",      "icon": "chrome",    "detail": "Dang luot web"},
-        "firefox.exe":   {"name": "Firefox",            "icon": "firefox",   "detail": "Dang luot web"},
-        "discord.exe":   {"name": "Discord",            "icon": "discord",   "detail": "Dang chat"},
-        "notepad.exe":   {"name": "Notepad",            "icon": "notepad",   "detail": "Dang viet"},
-        "explorer.exe":  {"name": "File Explorer",      "icon": "explorer",  "detail": "Dang xem file"},
-        "Photoshop.exe": {"name": "Adobe Photoshop",    "icon": "photoshop", "detail": "Dang edit anh"},
-        "vlc.exe":       {"name": "VLC Media Player",   "icon": "vlc",       "detail": "Dang xem video"},
-        "spotify.exe":   {"name": "Spotify",            "icon": "spotify",   "detail": "Dang nghe nhac"},
-        "steam.exe":     {"name": "Steam",              "icon": "steam",     "detail": "Dang choi game"},
-    }
+        "Code.exe": {
+            "name": "Visual Studio Code",
+            "icon": "vscode",
+            "detail": "Coding",
+        },
+        "chrome.exe": {
+            "name": "Google Chrome",
+            "icon": "chrome",
+            "detail": "Browsing",
+        },
+        "firefox.exe": {
+            "name": "Firefox",
+            "icon": "firefox",
+            "detail": "Browsing",
+        },
+        "discord.exe": {
+            "name": "Discord",
+            "icon": "discord",
+            "detail": "Chatting",
+        },
+        "notepad.exe": {
+            "name": "Notepad",
+            "icon": "notepad",
+            "detail": "Writing",
+        },
+        "explorer.exe": {
+            "name": "File Explorer",
+            "icon": "explorer",
+            "detail": "Viewing files",
+        },
+        "Photoshop.exe": {
+            "name": "Adobe Photoshop",
+            "icon": "photoshop",
+            "detail": "Editing images",
+        },
+        "vlc.exe": {
+            "name": "VLC Media Player",
+            "icon": "vlc",
+            "detail": "Watching video",
+        },
+        "spotify.exe": {
+            "name": "Spotify",
+            "icon": "spotify",
+            "detail": "Listening to music",
+        },
+        "steam.exe": {
+            "name": "Steam",
+            "icon": "steam",
+            "detail": "Playing games",
+        },
+        "zed.exe": {
+            "name": "Zed",
+            "icon": "zed",
+            "detail": "Editing code",
+        },
+    },
 }
 
 
@@ -52,6 +98,7 @@ def save_config(cfg):
 
 # ── Window detection ──────────────────────────────────────────────────────────
 
+
 def get_active_window_info():
     try:
         hwnd = win32gui.GetForegroundWindow()
@@ -64,6 +111,7 @@ def get_active_window_info():
 
 
 # ── RPC Manager ───────────────────────────────────────────────────────────────
+
 
 class RPCManager:
     def __init__(self):
@@ -84,23 +132,23 @@ class RPCManager:
 
     def reload_config(self):
         self.config = load_config()
-        self.last_state = None  # force update với config mới
-        print("[CFG] Config da duoc reload.")
+        self.last_state = None  # force update with new config
+        print("[CFG] Config reloaded.")
 
     def connect(self):
         client_id = self.config["client_id"]
         if client_id == "YOUR_CLIENT_ID_HERE":
-            print("[!] Chua set Client ID! Mo config.json va dien vao.")
+            print("[!] Client ID not set! Open config.json and enter your client ID.")
             return False
         try:
             self.rpc = Presence(client_id)
             self.rpc.connect()
             self.connected = True
             self._last_reconnect = 0
-            print("[OK] Da ket noi Discord RPC!")
+            print("[OK] Connected to Discord RPC!")
             return True
         except Exception as e:
-            print(f"[!!] Khong ket noi duoc Discord: {e}")
+            print(f"[!!] Can't connect to Discord: {e}")
             self.connected = False
             self._last_reconnect = time.time()
             return False
@@ -138,26 +186,30 @@ class RPCManager:
 
         if mapping:
             app_name = mapping.get("name", proc_name)
-            detail   = mapping.get("detail", f"Dang dung {app_name}")
+            detail = mapping.get("detail", f"Using {app_name}")
             icon_key = mapping.get("icon")
         else:
-            clean    = proc_name.replace(".exe", "")
+            clean = proc_name.replace(".exe", "")
             app_name = clean
-            detail   = f"Dang dung {clean}"
+            detail = f"Using {clean}"
             icon_key = None
 
-        state = window_title[:128] if self.config.get("show_window_title") and window_title else None
+        state = (
+            window_title[:128]
+            if self.config.get("show_window_title") and window_title
+            else None
+        )
         start_ts = elapsed_since if elapsed_since else self.start_time
 
         presence = {
             "details": detail,
-            "state":   state,
-            "start":   start_ts,
-            "small_text": "[LOCKED]" if self.locked else "Dang hoat dong",
+            "state": state,
+            "start": start_ts,
+            "small_text": "[LOCKED]" if self.locked else "Currently active",
         }
         if icon_key:
             presence["large_image"] = icon_key
-            presence["large_text"]  = app_name
+            presence["large_text"] = app_name
 
         return presence
 
@@ -170,14 +222,14 @@ class RPCManager:
             return
 
         if self.locked and self.locked_proc:
-            proc_name    = self.locked_proc
+            proc_name = self.locked_proc
             window_title = self.locked_title
-            since        = self.locked_since
+            since = self.locked_since
         else:
             proc_name, window_title = get_active_window_info()
             since = None
 
-            # Idle detection — không có window active thì clear presence
+            # Idle detection — if no window active then clear presence
             if not proc_name:
                 if not self.presence_cleared:
                     try:
@@ -190,7 +242,7 @@ class RPCManager:
                 return
 
         self.presence_cleared = False
-        presence  = self._build_presence(proc_name, window_title, elapsed_since=since)
+        presence = self._build_presence(proc_name, window_title, elapsed_since=since)
         state_key = (proc_name, window_title, self.locked)
 
         if state_key == self.last_state:
@@ -202,7 +254,7 @@ class RPCManager:
             lock_tag = " [LOCKED]" if self.locked else ""
             print(f"[UP]{lock_tag} {proc_name} -- {(window_title or '')[:50]}")
         except Exception as e:
-            print(f"[!!] Update loi: {e}")
+            print(f"[!!] Update error: {e}")
             self.connected = False
             self._last_reconnect = time.time()
 
@@ -211,11 +263,14 @@ class RPCManager:
         while self.running:
             if not self.connected:
                 if self._should_reconnect():
-                    print("[~] Dang thu ket noi lai...")
+                    print("[~] Reconnecting...")
                     self.connect()
                 else:
-                    remaining = int(self.config.get("reconnect_delay", 30) - (time.time() - self._last_reconnect))
-                    print(f"[~] Cho {remaining}s truoc khi ket noi lai...")
+                    remaining = int(
+                        self.config.get("reconnect_delay", 30)
+                        - (time.time() - self._last_reconnect)
+                    )
+                    print(f"[~] Wait {remaining}s before reconnecting...")
             else:
                 self.update_once()
             time.sleep(interval)
@@ -236,8 +291,9 @@ class RPCManager:
 
 # ── Tray icon ─────────────────────────────────────────────────────────────────
 
+
 def make_icon(locked=False):
-    img  = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+    img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
     color = (231, 76, 60) if locked else (88, 101, 242)
     draw.ellipse([4, 4, 60, 60], fill=color)
@@ -250,8 +306,10 @@ def run_tray(mgr):
 
     def refresh_icon():
         if icon_ref[0]:
-            icon_ref[0].icon  = make_icon(locked=mgr.locked)
-            icon_ref[0].title = "Discord RPC [LOCKED]" if mgr.locked else "Discord RPC Watcher"
+            icon_ref[0].icon = make_icon(locked=mgr.locked)
+            icon_ref[0].title = (
+                "Discord RPC [LOCKED]" if mgr.locked else "Discord RPC Watcher"
+            )
 
     def on_toggle_rpc(icon, item):
         if mgr.running:
@@ -274,22 +332,22 @@ def run_tray(mgr):
         icon.stop()
 
     def rpc_label(item):
-        return "Tat RPC" if mgr.running else "Bat RPC"
+        return "Turn on RPC" if mgr.running else "Turn off RPC"
 
     def lock_label(item):
         if mgr.locked:
             proc = mgr.locked_proc or "?"
             return f"Mo khoa ({proc.replace('.exe', '')})"
-        return "Khoa app hien tai"
+        return "Lock current app"
 
     menu = Menu(
-        MenuItem(rpc_label,          on_toggle_rpc),
-        MenuItem(lock_label,         on_toggle_lock),
+        MenuItem(rpc_label, on_toggle_rpc),
+        MenuItem(lock_label, on_toggle_lock),
         Menu.SEPARATOR,
-        MenuItem("Reload config",    on_reload_config),
-        MenuItem("Mo config.json",   on_open_config),
+        MenuItem("Reload config", on_reload_config),
+        MenuItem("Open config.json", on_open_config),
         Menu.SEPARATOR,
-        MenuItem("Thoat",            on_quit),
+        MenuItem("Quit", on_quit),
     )
 
     tray = Icon("Discord RPC", make_icon(), "Discord RPC Watcher", menu)
@@ -302,8 +360,6 @@ def run_tray(mgr):
 
 if __name__ == "__main__":
     if sys.platform == "win32":
-        ctypes.windll.user32.ShowWindow(
-            ctypes.windll.kernel32.GetConsoleWindow(), 0
-        )
+        ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), 0)
     mgr = RPCManager()
     run_tray(mgr)

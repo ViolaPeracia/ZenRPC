@@ -1,19 +1,19 @@
 @echo off
 title Discord RPC Watcher
 
-echo Kiem tra Python...
+echo Checking Python...
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo [!] Python chua duoc cai dat. Tai tai: https://python.org
+    echo [!] Python not install. Download at: https://python.org
     pause
     exit
 )
 
-echo Cai thu vien...
+echo install lib...
 pip install -r requirements.txt -q
 
-echo Khoi dong Discord RPC Watcher...
+echo Starting Discord RPC Watcher...
 start pythonw main.py
 
-echo [v] Da khoi dong! Kiem tra tray icon goc duoi ben phai man hinh.
+echo [v] Started! Check tray icon at the bottom right corner of your screen.
 timeout /t 3 >nul

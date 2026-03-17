@@ -1,5 +1,5 @@
 {
-  "client_id": "1482692658504794289",
+  "client_id": "YOUR_CLIENT_ID_HERE",
   "update_interval": 15,
   "reconnect_delay": 30,
   "show_window_title": true,

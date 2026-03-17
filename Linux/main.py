@@ -1,35 +1,44 @@
-import time
-import threading
-import os
 import json
-import subprocess
+import os
 import signal
+import subprocess
+import threading
+import time
+
 from pypresence import Presence
 
 # ── Config ────────────────────────────────────────────────────────────────────
 CONFIG_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.json")
 DEFAULT_CONFIG = {
-    "client_id": "1482692658504794289",
+    "client_id": "YOUR_CLIENT_ID_HERE",
     "update_interval": 15,
     "reconnect_delay": 30,
     "show_window_title": True,
     "clear_on_idle": True,
     "custom_mappings": {
-        "code":          {"name": "Visual Studio Code", "icon": "vscode",    "detail": "Coding"},
-        "chrome":        {"name": "Google Chrome",      "icon": "chrome",    "detail": "Browsing"},
-        "firefox":       {"name": "Firefox",            "icon": "firefox",   "detail": "Browsing"},
-        "discord":       {"name": "Discord",            "icon": "discord",   "detail": "Chatting"},
-        "gedit":         {"name": "Text Editor",        "icon": "notepad",   "detail": "Writing"},
-        "nautilus":      {"name": "Files",              "icon": "explorer",  "detail": "Browsing files"},
-        "gimp":          {"name": "GIMP",               "icon": "gimp",      "detail": "Editing image"},
-        "vlc":           {"name": "VLC Media Player",   "icon": "vlc",       "detail": "Watching video"},
-        "spotify":       {"name": "Spotify",            "icon": "spotify",   "detail": "Listening to music"},
-        "steam":         {"name": "Steam",              "icon": "steam",     "detail": "Gaming"},
-        "obs":           {"name": "OBS Studio",         "icon": "obs",       "detail": "Streaming"},
-        "terminal":      {"name": "Terminal",           "icon": "terminal",  "detail": "In terminal"},
-        "gnome-terminal":{"name": "Terminal",           "icon": "terminal",  "detail": "In terminal"},
-        "konsole":       {"name": "Terminal",           "icon": "terminal",  "detail": "In terminal"},
-    }
+        "code": {"name": "Visual Studio Code", "icon": "vscode", "detail": "Coding"},
+        "chrome": {"name": "Google Chrome", "icon": "chrome", "detail": "Browsing"},
+        "firefox": {"name": "Firefox", "icon": "firefox", "detail": "Browsing"},
+        "discord": {"name": "Discord", "icon": "discord", "detail": "Chatting"},
+        "gedit": {"name": "Text Editor", "icon": "notepad", "detail": "Writing"},
+        "nautilus": {"name": "Files", "icon": "explorer", "detail": "Browsing files"},
+        "gimp": {"name": "GIMP", "icon": "gimp", "detail": "Editing image"},
+        "vlc": {"name": "VLC Media Player", "icon": "vlc", "detail": "Watching video"},
+        "spotify": {
+            "name": "Spotify",
+            "icon": "spotify",
+            "detail": "Listening to music",
+        },
+        "steam": {"name": "Steam", "icon": "steam", "detail": "Gaming"},
+        "obs": {"name": "OBS Studio", "icon": "obs", "detail": "Streaming"},
+        "terminal": {"name": "Terminal", "icon": "terminal", "detail": "In terminal"},
+        "gnome-terminal": {
+            "name": "Terminal",
+            "icon": "terminal",
+            "detail": "In terminal",
+        },
+        "konsole": {"name": "Terminal", "icon": "terminal", "detail": "In terminal"},
+    },
 }
 
 
@@ -51,6 +60,7 @@ def save_config(cfg):
 
 # ── Window detection (Linux) ──────────────────────────────────────────────────
 
+
 def _run(cmd):
     try:
         return subprocess.check_output(cmd, stderr=subprocess.DEVNULL).decode().strip()
@@ -68,7 +78,7 @@ def get_active_window_info():
         win_id = _run(["xdotool", "getactivewindow"])
         if win_id:
             title = _run(["xdotool", "getwindowname", win_id])
-            pid   = _run(["xdotool", "getwindowpid", win_id])
+            pid = _run(["xdotool", "getwindowpid", win_id])
             if pid:
                 proc_name = _run(["cat", f"/proc/{pid}/comm"])
                 return proc_name.lower(), title
@@ -92,12 +102,14 @@ def get_active_window_info():
 
 # ── Tray icon (AppIndicator / pystray) ───────────────────────────────────────
 
+
 def _make_tray(mgr):
     """
     Try AppIndicator3 (GNOME) first, fall back to pystray.
     """
     try:
         import gi
+
         gi.require_version("AppIndicator3", "0.1")
         gi.require_version("Gtk", "3.0")
         from gi.repository import AppIndicator3, Gtk
@@ -106,21 +118,43 @@ def _make_tray(mgr):
             menu = Gtk.Menu()
 
             def add_item(label_fn, callback):
-                item = Gtk.MenuItem(label=label_fn() if callable(label_fn) else label_fn)
+                item = Gtk.MenuItem(
+                    label=label_fn() if callable(label_fn) else label_fn
+                )
                 item._label_fn = label_fn if callable(label_fn) else None
                 item.connect("activate", callback)
                 menu.append(item)
                 return item
 
-            rpc_item  = add_item(lambda: "Disable RPC" if mgr.running else "Enable RPC",
-                                 lambda _: (mgr.stop() if mgr.running else mgr.start()) or _refresh_menu())
-            lock_item = add_item(lambda: f"Unlock ({mgr.locked_proc or '?'})" if mgr.locked else "Lock current app",
-                                 lambda _: (mgr.toggle_lock()) or _refresh_menu())
+            rpc_item = add_item(
+                lambda: "Disable RPC" if mgr.running else "Enable RPC",
+                lambda _: (
+                    (mgr.stop() if mgr.running else mgr.start()) or _refresh_menu()
+                ),
+            )
+            lock_item = add_item(
+                lambda: (
+                    f"Unlock ({mgr.locked_proc or '?'})"
+                    if mgr.locked
+                    else "Lock current app"
+                ),
+                lambda _: (mgr.toggle_lock()) or _refresh_menu(),
+            )
             menu.append(Gtk.SeparatorMenuItem())
             add_item("Reload config", lambda _: mgr.reload_config())
-            add_item("Open config.json", lambda _: subprocess.Popen(["xdg-open", CONFIG_FILE]))
+            add_item(
+                "Open config.json",
+                lambda _: subprocess.Popen(["xdg-open", CONFIG_FILE]),
+            )
             menu.append(Gtk.SeparatorMenuItem())
-            add_item("Quit", lambda _: (mgr.stop(), indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE), Gtk.main_quit()))
+            add_item(
+                "Quit",
+                lambda _: (
+                    mgr.stop(),
+                    indicator.set_status(AppIndicator3.IndicatorStatus.PASSIVE),
+                    Gtk.main_quit(),
+                ),
+            )
             menu.show_all()
             return menu
 
@@ -130,7 +164,7 @@ def _make_tray(mgr):
         indicator = AppIndicator3.Indicator.new(
             "discord-rpc",
             "dialog-information",
-            AppIndicator3.IndicatorCategory.APPLICATION_STATUS
+            AppIndicator3.IndicatorCategory.APPLICATION_STATUS,
         )
         indicator.set_status(AppIndicator3.IndicatorStatus.ACTIVE)
         indicator.set_menu(build_menu())
@@ -144,11 +178,11 @@ def _make_tray(mgr):
 
 
 def _make_tray_pystray(mgr):
-    from pystray import Icon, Menu, MenuItem
     from PIL import Image, ImageDraw
+    from pystray import Icon, Menu, MenuItem
 
     def make_icon(locked=False):
-        img  = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+        img = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
         draw = ImageDraw.Draw(img)
         color = (231, 76, 60) if locked else (88, 101, 242)
         draw.ellipse([4, 4, 60, 60], fill=color)
@@ -159,12 +193,16 @@ def _make_tray_pystray(mgr):
 
     def refresh_icon():
         if icon_ref[0]:
-            icon_ref[0].icon  = make_icon(locked=mgr.locked)
-            icon_ref[0].title = "Discord RPC [LOCKED]" if mgr.locked else "Discord RPC Watcher"
+            icon_ref[0].icon = make_icon(locked=mgr.locked)
+            icon_ref[0].title = (
+                "Discord RPC [LOCKED]" if mgr.locked else "Discord RPC Watcher"
+            )
 
     def on_toggle_rpc(icon, item):
-        if mgr.running: mgr.stop()
-        else: mgr.start()
+        if mgr.running:
+            mgr.stop()
+        else:
+            mgr.start()
 
     def on_toggle_lock(icon, item):
         mgr.toggle_lock()
@@ -189,13 +227,13 @@ def _make_tray_pystray(mgr):
         return "Lock current app"
 
     menu = Menu(
-        MenuItem(rpc_label,       on_toggle_rpc),
-        MenuItem(lock_label,      on_toggle_lock),
+        MenuItem(rpc_label, on_toggle_rpc),
+        MenuItem(lock_label, on_toggle_lock),
         Menu.SEPARATOR,
         MenuItem("Reload config", on_reload),
-        MenuItem("Open config",   on_open_config),
+        MenuItem("Open config", on_open_config),
         Menu.SEPARATOR,
-        MenuItem("Quit",          on_quit),
+        MenuItem("Quit", on_quit),
     )
 
     tray = Icon("Discord RPC", make_icon(), "Discord RPC Watcher", menu)
@@ -205,6 +243,7 @@ def _make_tray_pystray(mgr):
 
 
 # ── RPC Manager ───────────────────────────────────────────────────────────────
+
 
 class RPCManager:
     def __init__(self):
@@ -275,29 +314,33 @@ class RPCManager:
 
     def _build_presence(self, proc_name, window_title, elapsed_since=None):
         mappings = self.config.get("custom_mappings", {})
-        mapping  = mappings.get(proc_name)
+        mapping = mappings.get(proc_name)
 
         if mapping:
             app_name = mapping.get("name", proc_name)
-            detail   = mapping.get("detail", f"Using {app_name}")
+            detail = mapping.get("detail", f"Using {app_name}")
             icon_key = mapping.get("icon")
         else:
             app_name = proc_name
-            detail   = f"Using {proc_name}"
+            detail = f"Using {proc_name}"
             icon_key = None
 
-        state    = window_title[:128] if self.config.get("show_window_title") and window_title else None
+        state = (
+            window_title[:128]
+            if self.config.get("show_window_title") and window_title
+            else None
+        )
         start_ts = elapsed_since if elapsed_since else self.start_time
 
         presence = {
-            "details":    detail,
-            "state":      state,
-            "start":      start_ts,
+            "details": detail,
+            "state": state,
+            "start": start_ts,
             "small_text": "[LOCKED]" if self.locked else "Active",
         }
         if icon_key:
             presence["large_image"] = icon_key
-            presence["large_text"]  = app_name
+            presence["large_text"] = app_name
 
         return presence
 
@@ -310,9 +353,9 @@ class RPCManager:
             return
 
         if self.locked and self.locked_proc:
-            proc_name    = self.locked_proc
+            proc_name = self.locked_proc
             window_title = self.locked_title
-            since        = self.locked_since
+            since = self.locked_since
         else:
             proc_name, window_title = get_active_window_info()
             since = None
@@ -329,7 +372,7 @@ class RPCManager:
                 return
 
         self.presence_cleared = False
-        presence  = self._build_presence(proc_name, window_title, elapsed_since=since)
+        presence = self._build_presence(proc_name, window_title, elapsed_since=since)
         state_key = (proc_name, window_title, self.locked)
 
         if state_key == self.last_state:
@@ -353,7 +396,10 @@ class RPCManager:
                     print("[~] Reconnecting...")
                     self.connect()
                 else:
-                    remaining = int(self.config.get("reconnect_delay", 30) - (time.time() - self._last_reconnect))
+                    remaining = int(
+                        self.config.get("reconnect_delay", 30)
+                        - (time.time() - self._last_reconnect)
+                    )
                     print(f"[~] Waiting {remaining}s before reconnect...")
             else:
                 self.update_once()
@@ -375,6 +421,7 @@ class RPCManager:
 
 # ── Entry ─────────────────────────────────────────────────────────────────────
 
+
 def main():
     mgr = RPCManager()
 
@@ -384,7 +431,7 @@ def main():
         mgr.stop()
         os._exit(0)
 
-    signal.signal(signal.SIGINT,  handle_signal)
+    signal.signal(signal.SIGINT, handle_signal)
     signal.signal(signal.SIGTERM, handle_signal)
 
     _make_tray(mgr)
