@@ -51,65 +51,117 @@ Local unit testing via `pytest` (15 offline tests passing without requiring Disc
 - `config.json` is local-only and ignored via `.gitignore` to avoid committing personal application IDs.
 - User mappings in `config.json` are automatically merged with `DEFAULT_CONFIG` so adding or overriding individual apps does not lose built-in mappings.
 
-## 8. Milestones & Status
+## 8. Milestones & Task Tracking
 
-### Completed Baseline
-- **M1 — Consolidation & Core Reliability:** [COMPLETED]
-  - Merged Windows & Linux into `app/` and root `main.py`
-  - Fixed startup connection stall and automatic reconnect
-  - Implemented per-app elapsed timers (persisting on title change)
-  - Fixed configuration path resolution relative to script base directory
-  - Added offline pytest suite
-  - Cleaned launch and install scripts
-  - Added tray-controlled "Lock to Current App" mode
-- **M2 — Linux & Platform Reliability:** [COMPLETED]
-  - Added strict 2-second timeouts to `xdotool` calls
-  - Direct `/proc/<pid>/cmdline` parsing for robust binary detection
-  - Corrected Wayland documentation and ensured graceful degradation without crashing
-- **M2.5 — Post-Migration Process & Asset Parity Audit:** [COMPLETED]
-  - Complete inventory of pre-migration process recognition rules (all 28 process rules across 14 asset keys verified)
-  - Preserved exact Discord asset keys (`vscode`, `chrome`, `firefox`, `discord`, `notepad`, `explorer`, `photoshop`, `gimp`, `vlc`, `spotify`, `steam`, `obs`, `zed`, `terminal`)
-  - Implemented case-insensitive and `.exe`-extension-agnostic matching
-  - Maintained identical unrecognized process fallback (`Using <process>`)
-  - Added comprehensive automated parity tests in `tests/test_presence.py`
+### Completed Milestones
+- [x] **M1 — Consolidation & Core Reliability**
+  - [x] Merged Windows & Linux into `app/` and root `main.py`
+  - [x] Fixed startup connection stall and automatic reconnect
+  - [x] Implemented per-app elapsed timers (persisting on title change)
+  - [x] Fixed configuration path resolution relative to script base directory
+  - [x] Added offline pytest suite
+  - [x] Cleaned launch and install scripts
+  - [x] Added tray-controlled "Lock to Current App" mode
+- [x] **M2 — Linux & Platform Reliability**
+  - [x] Added strict 2-second timeouts to `xdotool` calls
+  - [x] Direct `/proc/<pid>/cmdline` parsing for robust binary detection
+  - [x] Corrected Wayland documentation and ensured graceful degradation without crashing
+- [x] **M2.5 — Post-Migration Process & Asset Parity Audit**
+  - [x] Complete inventory of pre-migration process recognition rules (all 28 process rules across 14 asset keys verified)
+  - [x] Preserved exact Discord asset keys (`vscode`, `chrome`, `firefox`, `discord`, `notepad`, `explorer`, `photoshop`, `gimp`, `vlc`, `spotify`, `steam`, `obs`, `zed`, `terminal`)
+  - [x] Implemented case-insensitive and `.exe`-extension-agnostic matching
+  - [x] Maintained identical unrecognized process fallback (`Using <process>`)
+  - [x] Added comprehensive automated parity tests in `tests/test_presence.py`
 
 ---
 
 ### Active Development: Windows Priority (CURRENT FOCUS)
 
-- **M2.6-W — Windows Stabilization:** [ACTIVE / IN PROGRESS]
-  - **Windows runtime baseline verification:** Verify on real Windows environment across Discord offline/restart cycles, process switching, title continuity, lock mode, and live reload (#1)
-  - **Windows detector reliability:** Harden Win32 foreground window, PID, and `psutil` process resolution against null HWND, vanished PIDs, and access errors (#2)
-  - **Windows detector unit tests:** Add offline tests mocking `win32gui`, `win32process`, and `psutil` error branches (#3)
-  - **Windows launcher and startup behavior:** Audit `run.bat`, `pythonw.exe`, console suppression, and ensure working-directory independence (#4)
-  - **Windows process & asset mapping parity check:** Verify exact parity across all 28 recognized rules and 14 asset keys (#5)
+#### Milestone: M2.6-W — Windows Stabilization
+- [ ] **#1** — `[Windows] Windows runtime baseline verification`
+  - [ ] Discord running before watcher starts
+  - [ ] Discord offline at startup with automatic background reconnect
+  - [ ] Discord closing and restarting while watcher stays alive
+  - [ ] Application switching (timer reset) and window title changes (timer preserved)
+  - [ ] Process replacement / exit handling
+  - [ ] Lock and unlock modes via system tray
+  - [ ] Live configuration reload from tray menu
+  - [ ] Rate-limit interval handling and clamp (>=15s)
+  - [ ] Multi-byte UTF-8 window titles
+  - [ ] Tray icon visual indicator (Blurple active, Red locked)
+  - [ ] Clean shutdown and presence clearing
+- [ ] **#2** — `[Windows] Windows detector reliability`
+  - [ ] Guard against null / zero HWND (desktop, lock screen)
+  - [ ] Safe PID validation (`pid <= 0`)
+  - [ ] Handle process disappearing between PID and name lookup (`NoSuchProcess`)
+  - [ ] Handle permission and access restrictions (`AccessDenied`)
+  - [ ] Empty process name and empty title handling
+  - [ ] Unicode title safety
+  - [ ] Terminated / zombie process handling
+- [ ] **#3** — `[Windows] Windows detector unit tests`
+  - [ ] Offline test suite mocking `win32gui`, `win32process`, and `psutil`
+  - [ ] Valid foreground window test
+  - [ ] Missing HWND / invalid PID test
+  - [ ] Process disappearing / permission error branch tests
+  - [ ] Empty and multibyte title tests
+  - [ ] Recognized and fallback process lookup tests
+- [ ] **#4** — `[Windows] Windows launcher and startup behavior`
+  - [ ] Audit `run.bat` and `install.bat`
+  - [ ] Console window suppression (`ShowWindow(hwnd, 0)` and `pythonw.exe`)
+  - [ ] Working-directory-independent `config.json` resolution
+  - [ ] Windows Startup folder (`shell:startup`) shortcut compatibility
+- [ ] **#5** — `[Windows] Windows configuration and process-mapping parity check`
+  - [ ] Parity validation across all 28 process rules and 14 Discord asset keys
+  - [ ] Case-insensitive matching (`CHROME.EXE`, `code.exe`)
+  - [ ] Extension-agnostic matching (`.exe` stripped or present)
+  - [ ] Custom mapping merge and default preservation
 
-- **M2.7-W — Windows Release Baseline:** [UPCOMING]
-  - **Windows end-to-end verification checklist:** Validate full user lifecycle from clean clone and dependency install to tray shutdown (#6)
-  - **Windows documentation and usage verification:** Align `README.md` strictly with implemented features and controls (#7)
-  - **Windows release baseline:** Final verification gate certifying stable source-based Windows operation (#8)
+#### Milestone: M2.7-W — Windows Release Baseline
+- [ ] **#6** — `[Windows] Windows end-to-end verification checklist`
+  - [ ] Clean clone, dependency install, config creation, tray launch, Discord sync, and exit
+  - [ ] Record verification evidence
+- [ ] **#7** — `[Windows] Windows documentation and usage verification`
+  - [ ] Audit `README.md` against actual Windows implementation
+  - [ ] Verify installation, run options, tray controls, and limitations
+- [ ] **#8** — `[Windows] Windows release baseline`
+  - [ ] Final verification gate certifying stable source-based Windows release
 
 ---
 
 ### Planned Development: Linux Follow-up (IMMEDIATE NEXT)
 
-- **M3-L — Linux Stabilization:** [PLANNED — AFTER WINDOWS]
-  - **Linux X11/XWayland runtime verification:** Real desktop verification of `xdotool` active window detection, timer resets, and tray controls (#9)
-  - **Linux process detection reliability:** Audit `/proc/<pid>/cmdline` parsing to prevent comm 15-character truncation and handle disappearing processes (#10)
-  - **Linux subprocess safety tests:** Add offline unit tests for `_run_cmd` covering timeouts, non-zero exits, and missing tools (#11)
-  - **Linux desktop launcher verification:** Audit `discord-rpc.desktop` for path, working directory, and desktop menu execution (#12)
-  - **Linux native Wayland behavior & documentation:** Document boundary between X11, XWayland, and native Wayland graceful degradation (#13)
-  - **Linux release baseline:** Final verification gate certifying stable source-based Linux operation (#14)
+#### Milestone: M3-L — Linux Stabilization
+- [ ] **#9** — `[Linux] Linux X11/XWayland runtime verification`
+  - [ ] `xdotool` active window ID and PID resolution on physical X11/XWayland desktop
+  - [ ] Application switching and timer resets
+  - [ ] Title changes and timer preservation
+  - [ ] Subprocess timeout enforcement (no hanging external calls)
+- [ ] **#10** — `[Linux] Linux process detection reliability`
+  - [ ] Direct `/proc/<pid>/cmdline` parsing to bypass comm 15-character truncation
+  - [ ] Handle terminated processes, malformed data, and sandboxed `/proc`
+  - [ ] Secondary fallback to `/proc/<pid>/comm`
+- [ ] **#11** — `[Linux] Linux subprocess safety tests`
+  - [ ] Offline unit tests mocking `subprocess.check_output`
+  - [ ] Subprocess timeout expired, command not found, and non-zero exit coverage
+- [ ] **#12** — `[Linux] Linux desktop launcher verification`
+  - [ ] Audit `discord-rpc.desktop` path and working directory execution
+  - [ ] Application menu launcher testing
+- [ ] **#13** — `[Linux] Linux native Wayland behavior and documentation`
+  - [ ] Graceful degradation to idle on pure Wayland sessions without crashing
+  - [ ] Support boundary clarification (X11 vs XWayland vs pure Wayland)
+- [ ] **#14** — `[Linux] Linux release baseline`
+  - [ ] Final verification gate certifying stable source-based Linux release
 
 ---
 
 ### Deferred Development: Optional Cross-Platform Features
 
-- **M4 — Optional Cross-Platform Features:** [DEFERRED / POST-STABILIZATION]
-  - **Native compositor IPC support:** Optional Hyprland/Sway/Niri IPC modules without contaminating core presence logic (#15)
-  - **Privacy filtering:** Local process blacklist, title masking, and tray Private Mode (#16)
-  - **Persistent file logging:** Optional rotating local file handler for headless troubleshooting (#17)
-  - **Optional standalone packaging:** Evaluate PyInstaller build for source-free distribution (#18)
+#### Milestone: M4 — Optional Cross-Platform Features
+- [ ] **#15** — `[Cross-platform] Native compositor IPC support` (Hyprland / Sway / Niri)
+- [ ] **#16** — `[Cross-platform] Privacy filtering` (Process/app blacklist, title masking, Private Mode)
+- [ ] **#17** — `[Cross-platform] Persistent file logging` (Rotating local log file)
+- [ ] **#18** — `[Cross-platform] Optional standalone packaging` (PyInstaller single-file build)
+
 
 
 ## 9. Python vs. Rust Decision Gate
