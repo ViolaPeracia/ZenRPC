@@ -1,0 +1,154 @@
+{
+  "client_id": "YOUR_CLIENT_ID_HERE",
+  "update_interval": 15,
+  "reconnect_delay": 30,
+  "show_window_title": true,
+  "clear_on_idle": true,
+  "custom_mappings": {
+    "Code.exe": {
+      "name": "Visual Studio Code",
+      "icon": "vscode",
+      "detail": "Editing code"
+    },
+    "code": {
+      "name": "Visual Studio Code",
+      "icon": "vscode",
+      "detail": "Coding"
+    },
+    "chrome.exe": {
+      "name": "Google Chrome",
+      "icon": "chrome",
+      "detail": "Browsing the web"
+    },
+    "chrome": {
+      "name": "Google Chrome",
+      "icon": "chrome",
+      "detail": "Browsing"
+    },
+    "google-chrome": {
+      "name": "Google Chrome",
+      "icon": "chrome",
+      "detail": "Browsing"
+    },
+    "firefox.exe": {
+      "name": "Firefox",
+      "icon": "firefox",
+      "detail": "Browsing the web"
+    },
+    "firefox": {
+      "name": "Firefox",
+      "icon": "firefox",
+      "detail": "Browsing"
+    },
+    "discord.exe": {
+      "name": "Discord",
+      "icon": "discord",
+      "detail": "Chatting"
+    },
+    "discord": {
+      "name": "Discord",
+      "icon": "discord",
+      "detail": "Chatting"
+    },
+    "notepad.exe": {
+      "name": "Notepad",
+      "icon": "notepad",
+      "detail": "Writing"
+    },
+    "gedit": {
+      "name": "Text Editor",
+      "icon": "notepad",
+      "detail": "Writing"
+    },
+    "explorer.exe": {
+      "name": "File Explorer",
+      "icon": "explorer",
+      "detail": "Viewing files"
+    },
+    "nautilus": {
+      "name": "Files",
+      "icon": "explorer",
+      "detail": "Browsing files"
+    },
+    "Photoshop.exe": {
+      "name": "Adobe Photoshop",
+      "icon": "photoshop",
+      "detail": "Editing images"
+    },
+    "photoshop": {
+      "name": "Adobe Photoshop",
+      "icon": "photoshop",
+      "detail": "Editing images"
+    },
+    "gimp": {
+      "name": "GIMP",
+      "icon": "gimp",
+      "detail": "Editing image"
+    },
+    "vlc.exe": {
+      "name": "VLC Media Player",
+      "icon": "vlc",
+      "detail": "Watching video"
+    },
+    "vlc": {
+      "name": "VLC Media Player",
+      "icon": "vlc",
+      "detail": "Watching video"
+    },
+    "spotify.exe": {
+      "name": "Spotify",
+      "icon": "spotify",
+      "detail": "Listening to music"
+    },
+    "spotify": {
+      "name": "Spotify",
+      "icon": "spotify",
+      "detail": "Listening to music"
+    },
+    "steam.exe": {
+      "name": "Steam",
+      "icon": "steam",
+      "detail": "Playing games"
+    },
+    "steam": {
+      "name": "Steam",
+      "icon": "steam",
+      "detail": "Gaming"
+    },
+    "obs64.exe": {
+      "name": "OBS Studio",
+      "icon": "obs",
+      "detail": "Streaming"
+    },
+    "obs": {
+      "name": "OBS Studio",
+      "icon": "obs",
+      "detail": "Streaming"
+    },
+    "zed.exe": {
+      "name": "Zed",
+      "icon": "zed",
+      "detail": "Editing code"
+    },
+    "zed": {
+      "name": "Zed",
+      "icon": "zed",
+      "detail": "Editing code"
+    },
+    "terminal": {
+      "name": "Terminal",
+      "icon": "terminal",
+      "detail": "In terminal"
+    },
+    "gnome-terminal": {
+      "name": "Terminal",
+      "icon": "terminal",
+      "detail": "In terminal"
+    },
+    "konsole": {
+      "name": "Terminal",
+      "icon": "terminal",
+      "detail": "In terminal"
+    }
+  }
+}

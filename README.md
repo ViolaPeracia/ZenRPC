@@ -1,38 +1,22 @@
 # Discord RPC Watcher
 
-A lightweight tray app that detects your active window and displays it on Discord Rich Presence — available for both Windows and Linux.
+A lightweight desktop tray app that detects your active window and displays it on Discord Rich Presence — unified for both Windows and Linux.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python&logoColor=white)
 ![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux-lightgrey)
-![License](https://img.shields.io/badge/License-GPL%20v3-green)
-
----
-
-## Preview
-
-> Your Discord profile will show what app you are currently using, with the window title and how long you have been using it.
+![License](https://img.shields.io/badge/License-AGPL%20v3-orange)
 
 ---
 
 ## Features
 
-- Detects active window and updates Discord presence automatically
-- Lock mode — keep showing a specific app even when you switch windows
-- Idle detection — clears presence when no window is active
-- Reload config without restarting
-- Tray icon with red/purple indicator for lock state
-- Fully configurable via `config.json`
-
----
-
-## Download
-
-Choose your platform:
-
-| Platform | Folder |
-|----------|--------|
-| Windows 10/11 | [`/windows`](./windows) |
-| Ubuntu / Debian | [`/linux`](./linux) |
+- **Active Application Detection:** Automatically updates Discord presence with the currently active application and window title.
+- **Per-Application Elapsed Time:** The activity timer resets when switching to a different application, but stays continuous when switching tabs or files within the same app.
+- **Resilient Auto-Reconnect:** The watcher starts and remains alive even if Discord is not yet running, reconnecting automatically whenever Discord opens.
+- **Lock Mode:** Keep showing a specific app on Discord even while switching to other tasks.
+- **Idle Detection:** Clears presence automatically when no application window is active.
+- **Live Configuration Reload:** Edit `config.json` and reload immediately from the tray menu without restarting.
+- **Tray Status Indicator:** Visual tray icon (Blurple for active presence, Red for locked mode).
 
 ---
 
@@ -40,41 +24,44 @@ Choose your platform:
 
 ### Windows
 
-1. Go to the [`/windows`](./windows) folder
-2. Download all files
-3. Run `install.bat` to install dependencies
-4. Edit `config.json` and set your `client_id`
-5. Run `run.bat`
+1. Clone or download this repository.
+2. Run `install.bat` (or `pip install -r requirements.txt`).
+3. Copy `config.example.json` to `config.json` (created automatically on first run) and enter your Discord `client_id`.
+4. Run `run.bat` (or `pythonw main.py` for silent background execution).
 
 ### Linux
 
-1. Go to the [`/linux`](./linux) folder
-2. Download all files
+1. Clone or download this repository.
+2. Install system dependency for X11 window detection:
+   ```bash
+   sudo apt install xdotool   # Debian / Ubuntu
+   # or: sudo pacman -S xdotool  # Arch Linux
+   ```
 3. Run the installer:
-```bash
-chmod +x install.sh
-./install.sh
-```
-4. Edit `config.json` and set your `client_id`
+   ```bash
+   chmod +x install.sh
+   ./install.sh
+   ```
+4. Edit `config.json` with your Discord `client_id`.
 5. Run:
-```bash
-python3 main.py
-```
+   ```bash
+   python3 main.py
+   ```
 
 ---
 
 ## Getting a Client ID
 
-1. Go to https://discord.com/developers/applications
-2. Click **New Application** and give it any name
-3. Copy the **Application ID** — this is your `client_id`
-4. Paste it into `config.json`
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications).
+2. Click **New Application** and choose any name (e.g. "My Desktop").
+3. Copy the **Application ID** — this is your `client_id`.
+4. Paste it into your local `config.json`.
 
 ---
 
 ## Configuration
 
-Both versions share the same `config.json` format:
+Settings are stored in `config.json` next to `main.py` (`config.example.json` is provided as a template):
 
 ```json
 {
@@ -84,6 +71,11 @@ Both versions share the same `config.json` format:
   "show_window_title": true,
   "clear_on_idle": true,
   "custom_mappings": {
+    "Code.exe": {
+      "name": "Visual Studio Code",
+      "icon": "vscode",
+      "detail": "Editing code"
+    },
     "chrome.exe": {
       "name": "Google Chrome",
       "icon": "chrome",
@@ -95,14 +87,14 @@ Both versions share the same `config.json` format:
 
 | Key | Description | Default |
 |-----|-------------|---------|
-| `client_id` | Your Discord Application ID | required |
-| `update_interval` | Presence update frequency in seconds (min 15) | `15` |
-| `reconnect_delay` | Seconds to wait before reconnecting after disconnect | `30` |
-| `show_window_title` | Show the active window title on Discord | `true` |
+| `client_id` | Application ID from Discord Developer Portal | `YOUR_CLIENT_ID_HERE` |
+| `update_interval` | Presence update frequency in seconds (minimum `15` to respect Discord rate limits) | `15` |
+| `reconnect_delay` | Seconds to wait before attempting reconnection when Discord closes | `30` |
+| `show_window_title` | Display the active window title in Discord state | `true` |
 | `clear_on_idle` | Clear presence when no window is active | `true` |
-| `custom_mappings` | Map process names to display info | see below |
+| `custom_mappings` | Map process names to custom display names, icons, and activity descriptions | see `config.example.json` |
 
-### Adding a new app
+### Custom Application Mappings
 
 Add an entry to `custom_mappings`:
 
@@ -114,26 +106,21 @@ Add an entry to `custom_mappings`:
 }
 ```
 
-> **Note:** On Windows use the `.exe` name (e.g. `chrome.exe`). On Linux use the process name without extension (e.g. `chrome`).
->
-> Find the process name on Windows via **Task Manager -> Details tab**, on Linux run:
-> ```bash
-> xdotool getactivewindow getwindowpid | xargs -I{} cat /proc/{}/comm
-> ```
+> **Tip:** You can define both Windows (`.exe`) and Linux process names in `custom_mappings`. The matcher checks exact names, lowercase names, and names without `.exe` automatically.
 
-After editing, click **Reload config** from the tray menu — no restart needed.
+After editing, right-click the tray icon and select **Reload config** — changes take effect immediately.
 
 ---
 
-## Adding Icons
+## Platform Support & Limitations
 
-Discord RPC only accepts icons uploaded to your Developer Portal:
+### Windows
+- Windows 10/11 supported out of the box using Win32 API and `psutil`.
 
-1. Go to https://discord.com/developers/applications -> select your app
-2. Sidebar -> **Rich Presence** -> **Art Assets**
-3. Upload a PNG (512x512 recommended) and set the key name to match `"icon"` in your config
-
-Icon sources: [simpleicons.org](https://simpleicons.org) and [icon-icons.com](https://icon-icons.com)
+### Linux
+- **X11:** Fully supported via `xdotool` with strict timeouts. Process names are read directly from `/proc/<pid>/cmdline`.
+- **XWayland:** Applications running through XWayland are detectable via existing X11 tools.
+- **Native Wayland:** Wayland's security architecture intentionally prevents arbitrary unprivileged applications from querying other windows. On pure Wayland sessions without XWayland, the application will degrade gracefully to an idle state rather than crashing.
 
 ---
 
@@ -143,32 +130,25 @@ Right-click the tray icon:
 
 | Option | Description |
 |--------|-------------|
-| Enable / Disable RPC | Toggle presence on or off |
-| Lock current app | Keep showing current app even when switching windows |
-| Unlock | Return to auto-detect mode |
-| Reload config | Apply config changes without restarting |
-| Open config | Open `config.json` |
-| Quit | Exit the app |
-
-When **locked**, the tray icon turns **red**.
+| Enable / Disable RPC | Toggle presence updates on or off |
+| Lock current app / Unlock | Keep broadcasting the current app even when switching windows |
+| Reload config | Apply changes made in `config.json` without restarting |
+| Open config.json | Open `config.json` in your default text editor |
+| Quit | Cleanly disconnect and exit the application |
 
 ---
 
-## Requirements
+## Development & Testing
 
-### Windows
-- Windows 10/11
-- Python 3.8+
-- Discord Desktop App
+Run unit tests offline without requiring Discord or a graphical display:
 
-### Linux
-- Ubuntu / Debian (or any distro with apt)
-- Python 3.8+
-- X11 (Wayland supported via XWayland)
-- Discord Desktop App
+```bash
+pytest
+```
 
 ---
 
 ## License
 
-This project is licensed under the **GNU General Public License v3.0** — see the [LICENSE](LICENSE) file for details.
+This project includes the [GNU Affero General Public License v3.0](LICENSE).
+*(Note: If you are the repository owner, verify whether AGPL-3.0 or GPL-3.0 is your intended license).*
