@@ -94,9 +94,32 @@ Settings are stored in `config.json` next to `main.py` (`config.example.json` is
 | `clear_on_idle` | Clear presence when no window is active | `true` |
 | `custom_mappings` | Map process names to custom display names, icons, and activity descriptions | see `config.example.json` |
 
+### Built-in Recognized Applications
+
+The watcher includes 28 built-in recognition rules covering 14 popular desktop applications across Windows and Linux:
+
+| Application | Process Names | Discord Asset Key | Default Activity |
+| :--- | :--- | :--- | :--- |
+| **Visual Studio Code** | `Code.exe`, `code` | `vscode` | Editing code / Coding |
+| **Google Chrome** | `chrome.exe`, `chrome`, `google-chrome` | `chrome` | Browsing the web / Browsing |
+| **Mozilla Firefox** | `firefox.exe`, `firefox` | `firefox` | Browsing the web / Browsing |
+| **Discord** | `discord.exe`, `discord` | `discord` | Chatting |
+| **Notepad / Text Editor** | `notepad.exe`, `gedit` | `notepad` | Writing |
+| **File Explorer / Files** | `explorer.exe`, `nautilus` | `explorer` | Viewing files / Browsing files |
+| **Adobe Photoshop** | `Photoshop.exe`, `photoshop` | `photoshop` | Editing images |
+| **GIMP** | `gimp` | `gimp` | Editing image |
+| **VLC Media Player** | `vlc.exe`, `vlc` | `vlc` | Watching video |
+| **Spotify** | `spotify.exe`, `spotify` | `spotify` | Listening to music |
+| **Steam** | `steam.exe`, `steam` | `steam` | Playing games / Gaming |
+| **OBS Studio** | `obs64.exe`, `obs` | `obs` | Streaming |
+| **Zed** | `zed.exe`, `zed` | `zed` | Editing code |
+| **Terminal** | `terminal`, `gnome-terminal`, `konsole` | `terminal` | In terminal |
+
+Unrecognized applications automatically fall back to `"Using <process_name>"` without crashing.
+
 ### Custom Application Mappings
 
-Add an entry to `custom_mappings`:
+Add an entry to `custom_mappings` in `config.json` to customize existing apps or add new ones:
 
 ```json
 "obs64.exe": {
@@ -106,9 +129,10 @@ Add an entry to `custom_mappings`:
 }
 ```
 
-> **Tip:** You can define both Windows (`.exe`) and Linux process names in `custom_mappings`. The matcher checks exact names, lowercase names, and names without `.exe` automatically.
+> **Tip:** You can define both Windows (`.exe`) and Linux process names in `custom_mappings`. The matcher checks exact names, lowercase names, and names without `.exe` automatically. User custom mappings automatically merge with built-in defaults without losing standard rules.
 
 After editing, right-click the tray icon and select **Reload config** — changes take effect immediately.
+
 
 ---
 
@@ -145,6 +169,22 @@ Run unit tests offline without requiring Discord or a graphical display:
 ```bash
 pytest
 ```
+
+---
+
+## Development Roadmap
+
+The project follows a focused, platform-prioritized development roadmap:
+
+1. **Windows Stabilization & Baseline (Active Focus):**
+   - **`M2.6-W`:** Active-window Win32 detector hardening, offline mock unit tests, launcher independence, and mapping parity.
+   - **`M2.7-W`:** Windows end-to-end verification checklist, documentation audit, and stable source release gate.
+2. **Linux Stabilization & Baseline (Planned Follow-up):**
+   - **`M3-L`:** `/proc/<pid>/cmdline` parsing reliability, subprocess timeout safety tests, desktop launcher validation, and Wayland graceful degradation.
+3. **Optional Cross-Platform Enhancements (Deferred):**
+   - **`M4`:** Native Wayland compositor IPC, local privacy filtering, rotating local file logging, and standalone packaging.
+
+For architecture principles, detailed issue breakdowns, and task status, see [`docs/ROADMAP.md`](docs/ROADMAP.md) and the [GitHub Milestones](https://github.com/githubuser2777/discord-rpc/milestones).
 
 ---
 

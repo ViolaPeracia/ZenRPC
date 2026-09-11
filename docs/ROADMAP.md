@@ -52,6 +52,8 @@ Local unit testing via `pytest` (15 offline tests passing without requiring Disc
 - User mappings in `config.json` are automatically merged with `DEFAULT_CONFIG` so adding or overriding individual apps does not lose built-in mappings.
 
 ## 8. Milestones & Status
+
+### Completed Baseline
 - **M1 — Consolidation & Core Reliability:** [COMPLETED]
   - Merged Windows & Linux into `app/` and root `main.py`
   - Fixed startup connection stall and automatic reconnect
@@ -70,11 +72,45 @@ Local unit testing via `pytest` (15 offline tests passing without requiring Disc
   - Implemented case-insensitive and `.exe`-extension-agnostic matching
   - Maintained identical unrecognized process fallback (`Using <process>`)
   - Added comprehensive automated parity tests in `tests/test_presence.py`
-- **M3 — Optional / On-Demand Work:** [DEFERRED / ON-DEMAND]
-  - Standalone PyInstaller build script (`discord-rpc.exe`)
-  - Native compositor IPC (Sway / Hyprland)
-  - Privacy filtering (`exclude_processes`)
-  - Persistent file logging
+
+---
+
+### Active Development: Windows Priority (CURRENT FOCUS)
+
+- **M2.6-W — Windows Stabilization:** [ACTIVE / IN PROGRESS]
+  - **Windows runtime baseline verification:** Verify on real Windows environment across Discord offline/restart cycles, process switching, title continuity, lock mode, and live reload (#1)
+  - **Windows detector reliability:** Harden Win32 foreground window, PID, and `psutil` process resolution against null HWND, vanished PIDs, and access errors (#2)
+  - **Windows detector unit tests:** Add offline tests mocking `win32gui`, `win32process`, and `psutil` error branches (#3)
+  - **Windows launcher and startup behavior:** Audit `run.bat`, `pythonw.exe`, console suppression, and ensure working-directory independence (#4)
+  - **Windows process & asset mapping parity check:** Verify exact parity across all 28 recognized rules and 14 asset keys (#5)
+
+- **M2.7-W — Windows Release Baseline:** [UPCOMING]
+  - **Windows end-to-end verification checklist:** Validate full user lifecycle from clean clone and dependency install to tray shutdown (#6)
+  - **Windows documentation and usage verification:** Align `README.md` strictly with implemented features and controls (#7)
+  - **Windows release baseline:** Final verification gate certifying stable source-based Windows operation (#8)
+
+---
+
+### Planned Development: Linux Follow-up (IMMEDIATE NEXT)
+
+- **M3-L — Linux Stabilization:** [PLANNED — AFTER WINDOWS]
+  - **Linux X11/XWayland runtime verification:** Real desktop verification of `xdotool` active window detection, timer resets, and tray controls (#9)
+  - **Linux process detection reliability:** Audit `/proc/<pid>/cmdline` parsing to prevent comm 15-character truncation and handle disappearing processes (#10)
+  - **Linux subprocess safety tests:** Add offline unit tests for `_run_cmd` covering timeouts, non-zero exits, and missing tools (#11)
+  - **Linux desktop launcher verification:** Audit `discord-rpc.desktop` for path, working directory, and desktop menu execution (#12)
+  - **Linux native Wayland behavior & documentation:** Document boundary between X11, XWayland, and native Wayland graceful degradation (#13)
+  - **Linux release baseline:** Final verification gate certifying stable source-based Linux operation (#14)
+
+---
+
+### Deferred Development: Optional Cross-Platform Features
+
+- **M4 — Optional Cross-Platform Features:** [DEFERRED / POST-STABILIZATION]
+  - **Native compositor IPC support:** Optional Hyprland/Sway/Niri IPC modules without contaminating core presence logic (#15)
+  - **Privacy filtering:** Local process blacklist, title masking, and tray Private Mode (#16)
+  - **Persistent file logging:** Optional rotating local file handler for headless troubleshooting (#17)
+  - **Optional standalone packaging:** Evaluate PyInstaller build for source-free distribution (#18)
+
 
 ## 9. Python vs. Rust Decision Gate
 - **Decision:** Keep Python. It is simple, easily hackable, and uses negligible resources on a modern desktop.
