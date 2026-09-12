@@ -588,6 +588,10 @@ def test_art_assets_integrity():
     assert os.path.isfile(sources_doc), f"Missing SOURCES.md at {sources_doc}"
     assert os.path.getsize(sources_doc) > 100
 
+    readme_doc = os.path.join(assets_dir, "README.md")
+    assert os.path.isfile(readme_doc), f"Missing README.md at {readme_doc}"
+    assert os.path.getsize(readme_doc) > 100
+
     icon_keys = {m["icon"] for m in DEFAULT_CONFIG["custom_mappings"].values()}
     # Must cover at least 58 distinct application icons
     assert len(icon_keys) >= 58, f"Expected at least 58 distinct icon keys, got {len(icon_keys)}"
