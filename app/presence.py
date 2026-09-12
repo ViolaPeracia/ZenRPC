@@ -4,7 +4,7 @@ import time
 from app.config import load_config
 from app.detector import get_active_window_info
 
-logger = logging.getLogger("discord-rpc")
+logger = logging.getLogger("zenrpc")
 
 
 def truncate_utf8(text, max_bytes=128):
@@ -246,7 +246,7 @@ class PresenceEngine:
         self.connect()
         self._thread = threading.Thread(target=self._loop, daemon=True)
         self._thread.start()
-        logger.info("Discord RPC Watcher engine started.")
+        logger.info("ZenRPC engine started.")
 
     def stop(self):
         """Stops the background worker thread and disconnects RPC."""
@@ -254,4 +254,4 @@ class PresenceEngine:
         self.disconnect()
         if self._thread and self._thread.is_alive():
             self._thread.join(timeout=2)
-        logger.info("Discord RPC Watcher engine stopped.")
+        logger.info("ZenRPC engine stopped.")

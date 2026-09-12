@@ -1,5 +1,5 @@
 @echo off
-title Discord RPC Watcher
+title ZenRPC
 cd /d "%~dp0"
 
 if exist .venv\Scripts\pythonw.exe (

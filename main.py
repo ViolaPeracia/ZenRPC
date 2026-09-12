@@ -16,7 +16,7 @@ logging.basicConfig(
     format="[%(asctime)s] [%(levelname)s] %(message)s",
     datefmt="%H:%M:%S",
 )
-logger = logging.getLogger("discord-rpc")
+logger = logging.getLogger("zenrpc")
 
 
 def make_icon(locked=False):
@@ -58,7 +58,7 @@ def run_app():
     def refresh_icon():
         if icon_ref[0]:
             icon_ref[0].icon = make_icon(locked=engine.locked)
-            icon_ref[0].title = "Discord RPC [LOCKED]" if engine.locked else "Discord RPC Watcher"
+            icon_ref[0].title = "ZenRPC [LOCKED]" if engine.locked else "ZenRPC"
 
     def on_toggle_rpc(icon, item):
         if engine.running:
@@ -77,7 +77,7 @@ def run_app():
         open_file_externally(get_config_path())
 
     def on_quit(icon, item):
-        logger.info("Shutting down Discord RPC Watcher...")
+        logger.info("Shutting down ZenRPC...")
         engine.stop()
         icon.stop()
 
@@ -100,7 +100,7 @@ def run_app():
         MenuItem("Quit", on_quit),
     )
 
-    tray = Icon("Discord RPC", make_icon(), "Discord RPC Watcher", menu)
+    tray = Icon("ZenRPC", make_icon(), "ZenRPC", menu)
     icon_ref[0] = tray
 
     def handle_signal(sig, frame):

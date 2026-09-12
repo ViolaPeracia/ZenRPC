@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Discord RPC Watcher
+Name=ZenRPC
 Comment=Discord Rich Presence for active window
 Exec=python3 main.py
 Icon=discord

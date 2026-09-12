@@ -1,4 +1,4 @@
-# Discord RPC Watcher — Personal Roadmap
+# ZenRPC — Personal Roadmap
 
 ## 1. Project Goal
 A small, reliable, lightweight background utility for broadcasting active window context to Discord Rich Presence on the owner's personal Windows and Linux machines.
@@ -10,7 +10,7 @@ A small, reliable, lightweight background utility for broadcasting active window
 
 ## 3. Target Architecture
 ```text
-discord-rpc/
+ZenRPC/
 ├── app/
 │   ├── __init__.py
 │   ├── config.py           # Configuration loading, defaults, script-relative paths
@@ -144,7 +144,7 @@ Local unit testing via `pytest` (15 offline tests passing without requiring Disc
   - [ ] Offline unit tests mocking `subprocess.check_output`
   - [ ] Subprocess timeout expired, command not found, and non-zero exit coverage
 - [ ] **#12** — `[Linux] Linux desktop launcher verification`
-  - [ ] Audit `discord-rpc.desktop` path and working directory execution
+  - [ ] Audit `zenrpc.desktop` path and working directory execution
   - [ ] Application menu launcher testing
 - [ ] **#13** — `[Linux] Linux native Wayland behavior and documentation`
   - [ ] Graceful degradation to idle on pure Wayland sessions without crashing

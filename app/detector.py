@@ -3,7 +3,7 @@ import os
 import subprocess
 import sys
 
-logger = logging.getLogger("discord-rpc")
+logger = logging.getLogger("zenrpc")
 
 _LINUX_TOOLS_WARNED = False
 

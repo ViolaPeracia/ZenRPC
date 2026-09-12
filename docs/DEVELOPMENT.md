@@ -1,6 +1,6 @@
-# Developer Guide — Discord RPC Watcher
+# Developer Guide — ZenRPC
 
-A practical, lightweight reference for developing, testing, and extending **Discord RPC Watcher**.
+A practical, lightweight reference for developing, testing, and extending **ZenRPC**.
 
 ---
 
@@ -9,7 +9,7 @@ A practical, lightweight reference for developing, testing, and extending **Disc
 The project follows a modular, single-responsibility architecture without heavy frameworks or unnecessary abstractions:
 
 ```text
-discord-rpc/
+ZenRPC/
 ├── app/
 │   ├── __init__.py
 │   ├── config.py           # Configuration loading, validation, and defaults

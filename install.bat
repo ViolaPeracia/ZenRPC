@@ -1,5 +1,5 @@
 @echo off
-title Discord RPC Watcher - Installer
+title ZenRPC - Installer
 cd /d "%~dp0"
 
 echo [1/3] Checking Python...
@@ -31,7 +31,7 @@ echo.
 echo ========================================================
 echo  Installation complete!
 echo  1. Edit config.json and enter your Discord client_id.
-echo  2. Run run.bat to start Discord RPC Watcher.
+echo  2. Run run.bat to start ZenRPC.
 echo ========================================================
 echo.
 pause

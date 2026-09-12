@@ -1,4 +1,4 @@
-# Discord RPC Watcher
+# ZenRPC
 
 A personal, lightweight desktop background utility that automatically detects your currently active application and broadcasts it to your Discord profile via Rich Presence — seamlessly unified across Windows and Linux.
 
@@ -10,7 +10,7 @@ A personal, lightweight desktop background utility that automatically detects yo
 
 ## 🌟 Overview
 
-**Discord RPC Watcher** sits quietly in your system tray and monitors what window or application you are actively focused on. Whether you are coding in VS Code, browsing research in Firefox, drawing in Photoshop, listening to Spotify, or working in the terminal, it dynamically updates your Discord status with matching icons, activity details, and clean elapsed timers.
+**ZenRPC** sits quietly in your system tray and monitors what window or application you are actively focused on. Whether you are coding in VS Code, browsing research in Firefox, drawing in Photoshop, listening to Spotify, or working in the terminal, it dynamically updates your Discord status with matching icons, activity details, and clean elapsed timers.
 
 ### Key Highlights
 
@@ -43,8 +43,8 @@ To display rich presence on Discord, you need a free Discord Application ID:
 
 1. **Clone or download** this repository:
    ```bash
-   git clone https://github.com/githubuser2777/discord-rpc.git
-   cd discord-rpc
+   git clone https://github.com/githubuser2777/ZenRPC.git
+   cd ZenRPC
    ```
 2. **Install dependencies:**
    Double-click `install.bat` (or run `pip install -r requirements.txt` in your terminal or virtual environment).
@@ -55,7 +55,7 @@ To display rich presence on Discord, you need a free Discord Application ID:
      "client_id": "YOUR_DISCORD_APPLICATION_ID_HERE"
    }
    ```
-4. **Start the watcher:**
+4. **Start ZenRPC:**
    - **Silent Background Mode:** Double-click `run.bat` (runs unobtrusively in the system tray via `pythonw.exe`).
    - **Terminal / Debug Mode:** Run `python main.py` in your terminal to view real-time detection logs.
 5. *(Optional)* **Run at Windows Startup:**
@@ -78,18 +78,18 @@ To display rich presence on Discord, you need a free Discord Application ID:
    ```
 3. **Configure your Client ID:**
    Edit `config.json` and enter your Discord `client_id`.
-4. **Start the watcher:**
-   ```bash
-   python3 main.py
-   ```
-5. *(Optional)* **Desktop Menu Integration:**
-   Copy `discord-rpc.desktop` to `~/.local/share/applications/` to launch from your desktop application launcher.
+4. **Start ZenRPC:**
+    ```bash
+    python3 main.py
+    ```
+ 5. *(Optional)* **Desktop Menu Integration:**
+    Copy `zenrpc.desktop` to `~/.local/share/applications/` to launch from your desktop application launcher.
 
 ---
 
 ## 🖥️ System Tray Controls
 
-Once running, **Discord RPC Watcher** lives in your system tray (notification area). Right-click the icon to access quick controls:
+Once running, **ZenRPC** lives in your system tray (notification area). Right-click the icon to access quick controls:
 
 | Menu Action | Description |
 | :--- | :--- |
@@ -108,7 +108,7 @@ Once running, **Discord RPC Watcher** lives in your system tray (notification ar
 
 ## 📦 Supported Applications Out of the Box
 
-The watcher includes 28 built-in recognition rules covering 14 popular desktop tools across Windows and Linux:
+ZenRPC includes 28 built-in recognition rules covering 14 popular desktop tools across Windows and Linux:
 
 | Application | Process Names | Discord Asset Key | Default Activity Text |
 | :--- | :--- | :--- | :--- |
@@ -213,7 +213,7 @@ The project follows a disciplined, platform-prioritized development roadmap:
 3. **Optional Cross-Platform Enhancements (Deferred):**
    - **`M4`:** Native Wayland compositor IPC, local privacy filtering, rotating local file logging, and standalone packaging.
 
-For complete roadmap directives and task tracking, see [`docs/ROADMAP.md`](docs/ROADMAP.md) and the [GitHub Milestones](https://github.com/githubuser2777/discord-rpc/milestones).
+For complete roadmap directives and task tracking, see [`docs/ROADMAP.md`](docs/ROADMAP.md) and the [GitHub Milestones](https://github.com/githubuser2777/ZenRPC/milestones).
 
 ---
 
