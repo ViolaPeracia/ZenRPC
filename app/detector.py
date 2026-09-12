@@ -8,24 +8,81 @@ logger = logging.getLogger("zenrpc")
 _LINUX_TOOLS_WARNED = False
 
 
-def _get_active_windows():
-    """Detects active window on Windows using win32gui and psutil."""
-    try:
-        import psutil
-        import win32gui
-        import win32process
+try:
+    import psutil
+except ImportError:
+    psutil = None
 
-        hwnd = win32gui.GetForegroundWindow()
+try:
+    import win32gui
+    import win32process
+except ImportError:
+    win32gui = None
+    win32process = None
+
+
+def _get_active_windows():
+    """
+    Detects active window on Windows using win32gui and psutil.
+    Safely handles missing windows, invalid HWND/PIDs, terminated/zombie processes,
+    empty/whitespace titles, and platform exceptions by returning (None, None).
+    """
+    _wgui = win32gui
+    _wproc = win32process
+    _psutil = psutil
+
+    if _wgui is None or _wproc is None or _psutil is None:
+        try:
+            import psutil as _psutil
+            import win32gui as _wgui
+            import win32process as _wproc
+        except ImportError as e:
+            logger.debug("Windows detection modules not available: %s", e)
+            return None, None
+
+    try:
+        hwnd = _wgui.GetForegroundWindow()
         if not hwnd:
             return None, None
 
-        title = win32gui.GetWindowText(hwnd)
-        _, pid = win32process.GetWindowThreadProcessId(hwnd)
-        if pid <= 0:
+        title = ""
+        try:
+            raw_title = _wgui.GetWindowText(hwnd)
+            if isinstance(raw_title, str):
+                title = raw_title.strip()
+        except Exception as e:
+            logger.debug("Failed to retrieve window text for HWND %s: %s", hwnd, e)
+            title = ""
+
+        try:
+            _, pid = _wproc.GetWindowThreadProcessId(hwnd)
+        except Exception as e:
+            logger.debug("Failed to get process ID for HWND %s: %s", hwnd, e)
             return None, None
 
-        proc = psutil.Process(pid)
-        return proc.name(), title
+        if pid is None or not isinstance(pid, int) or pid <= 0:
+            return None, None
+
+        try:
+            proc = _psutil.Process(pid)
+            if hasattr(proc, "is_running") and not proc.is_running():
+                return None, None
+            raw_name = proc.name()
+        except (getattr(_psutil, "NoSuchProcess", Exception),
+                getattr(_psutil, "AccessDenied", Exception),
+                getattr(_psutil, "ZombieProcess", Exception)) as e:
+            logger.debug("psutil process error for PID %s: %s", pid, e)
+            return None, None
+        except Exception as e:
+            logger.debug("Unexpected error inspecting PID %s: %s", pid, e)
+            return None, None
+
+        if not raw_name or not isinstance(raw_name, str) or not raw_name.strip():
+            return None, None
+
+        proc_name = raw_name.strip()
+        return proc_name, title
+
     except Exception as e:
         logger.debug("Windows window detection error: %s", e)
         return None, None

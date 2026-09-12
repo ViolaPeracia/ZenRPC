@@ -201,6 +201,21 @@ pytest
 
 ---
 
+## 🔍 Troubleshooting (Windows)
+
+- **Status Not Updating on Discord:**
+  - Verify that your Discord Developer Application ID is entered in `config.json` under `"client_id"`.
+  - Ensure the Discord desktop client is actively running. ZenRPC will automatically reconnect once Discord starts.
+  - Make sure **Activity Privacy -> Display current activity as a status message** is enabled in your Discord user settings.
+- **Tray Icon Not Visible:**
+  - Windows automatically places new tray icons in the taskbar overflow area. Click the **^** arrow in your taskbar to reveal the ZenRPC icon, and drag it into the taskbar tray.
+- **Python Not Found on Windows:**
+  - Re-run the Python installer from [python.org](https://www.python.org/downloads/) and ensure **"Add python.exe to PATH"** is checked.
+- **Presence Update Delay:**
+  - Discord enforces a 15-second rate limit on rich presence updates. Setting `"update_interval"` lower than `15` in `config.json` is automatically clamped to `15` seconds to prevent rate-limit bans.
+
+---
+
 ## 🗺️ Development Roadmap
 
 The project follows a disciplined, platform-prioritized development roadmap:

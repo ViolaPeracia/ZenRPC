@@ -131,6 +131,9 @@ class PresenceEngine:
                     mapping = val
                     break
 
+            if not mapping and (clean_lower.startswith("gimp-") or clean_lower.startswith("gimp_")):
+                mapping = mappings.get("gimp")
+
         if mapping and isinstance(mapping, dict):
             app_name = mapping.get("name", clean_proc)
             detail = mapping.get("detail", f"Using {app_name}")

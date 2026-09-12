@@ -245,6 +245,9 @@ def test_premigration_process_and_asset_mappings(mock_rpc_factory):
             ("Photoshop.exe", "photoshop", "Adobe Photoshop", "Editing images"),
             ("photoshop", "photoshop", "Adobe Photoshop", "Editing images"),
             ("gimp", "gimp", "GIMP", "Editing image"),
+            ("gimp.exe", "gimp", "GIMP", "Editing image"),
+            ("gimp-2.10.exe", "gimp", "GIMP", "Editing image"),
+            ("GIMP-2.10.EXE", "gimp", "GIMP", "Editing image"),
             ("vlc.exe", "vlc", "VLC Media Player", "Watching video"),
             ("vlc", "vlc", "VLC Media Player", "Watching video"),
             ("spotify.exe", "spotify", "Spotify", "Listening to music"),
@@ -298,4 +301,126 @@ def test_unrecognized_process_fallback(mock_rpc_factory):
         assert "large_image" not in linux_presence
         assert linux_presence["details"] == "Using custom_binary"
         assert linux_presence["state"] == "Terminal Output"
+
+
+def test_idle_clears_presence_and_resets_on_return(mock_rpc_factory):
+    """When active window becomes None (idle), presence is cleared; resets when window returns."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        cfg_path = os.path.join(tmpdir, "config.json")
+        save_config({"client_id": "123456789", "clear_on_idle": True}, cfg_path)
+
+        current_window = ["Code.exe", "test.py"]
+
+        def mock_detector():
+            return current_window[0], current_window[1]
+
+        engine = PresenceEngine(
+            config_path=cfg_path,
+            detector_fn=mock_detector,
+            rpc_factory=mock_rpc_factory,
+        )
+        assert engine.connect() is True
+        rpc = mock_rpc_factory.instances[0]
+
+        # Active
+        engine.update_once()
+        assert len(rpc.updates) == 1
+        assert rpc.cleared is False
+
+        # Idle
+        current_window[0] = None
+        current_window[1] = None
+        engine.update_once()
+        assert rpc.cleared is True
+        assert engine.presence_cleared is True
+
+        # Active again
+        current_window[0] = "chrome.exe"
+        current_window[1] = "Google"
+        engine.update_once()
+        assert len(rpc.updates) == 2
+        assert engine.presence_cleared is False
+        assert rpc.updates[-1]["details"] == "Browsing the web"
+
+
+def test_discord_disconnect_and_reconnect_cycle(mock_rpc_factory):
+    """Simulated pipe failure marks engine disconnected, then reconnect restores updates."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        cfg_path = os.path.join(tmpdir, "config.json")
+        save_config({"client_id": "123456789"}, cfg_path)
+
+        engine = PresenceEngine(
+            config_path=cfg_path,
+            detector_fn=lambda: ("Code.exe", "file.py"),
+            rpc_factory=mock_rpc_factory,
+        )
+        assert engine.connect() is True
+        rpc = mock_rpc_factory.instances[0]
+
+        # Successful update
+        engine.update_once()
+        assert len(rpc.updates) == 1
+
+        # Simulate pipe break
+        rpc.fail_update = True
+        engine.last_state = None  # Force update attempt
+        engine.update_once()
+        assert engine.connected is False
+
+        # Simulate Discord restart
+        rpc.fail_update = False
+        assert engine.connect() is True
+        assert engine.connected is True
+
+
+def test_reload_config_resets_state(mock_rpc_factory, tmp_path):
+    """reload_config reloads config from disk and resets last_state so changes apply immediately."""
+    cfg_path = str(tmp_path / "config.json")
+    save_config({"client_id": "123456789"}, cfg_path)
+
+    engine = PresenceEngine(
+        config_path=cfg_path,
+        detector_fn=lambda: ("my_tool.exe", "Doc 1"),
+        rpc_factory=mock_rpc_factory,
+    )
+    assert engine.connect() is True
+    engine.update_once()
+    assert engine.last_state is not None
+
+    # Write new mapping to config
+    save_config({
+        "client_id": "123456789",
+        "custom_mappings": {
+            "my_tool.exe": {"name": "My Tool", "icon": "tool", "detail": "Building"}
+        }
+    }, cfg_path)
+
+    engine.reload_config()
+    assert engine.last_state is None
+    assert "my_tool.exe" in engine.config["custom_mappings"]
+
+    rpc = mock_rpc_factory.instances[0]
+    engine.update_once()
+    assert rpc.updates[-1]["large_image"] == "tool"
+    assert rpc.updates[-1]["details"] == "Building"
+
+
+def test_tray_icon_colors():
+    """make_icon produces Blurple when active and Red when locked."""
+    from main import make_icon
+    active_icon = make_icon(locked=False)
+    assert active_icon.size == (64, 64)
+    # Ring pixel: Blurple (88, 101, 242)
+    assert active_icon.getpixel((32, 10)) == (88, 101, 242, 255)
+    # Center pixel: White (255, 255, 255)
+    assert active_icon.getpixel((32, 32)) == (255, 255, 255, 255)
+
+    locked_icon = make_icon(locked=True)
+    assert locked_icon.size == (64, 64)
+    # Ring pixel: Red (231, 76, 60)
+    assert locked_icon.getpixel((32, 10)) == (231, 76, 60, 255)
+    # Center pixel: White (255, 255, 255)
+    assert locked_icon.getpixel((32, 32)) == (255, 255, 255, 255)
+
+
 

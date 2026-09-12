@@ -81,6 +81,19 @@ def test_script_relative_path():
     assert default_path.endswith("config.json")
 
 
+def test_cwd_independence(tmp_path):
+    """Configuration path resolution must not depend on process current working directory."""
+    original_cwd = os.getcwd()
+    try:
+        os.chdir(tmp_path)
+        default_path = get_config_path()
+        assert os.path.isabs(default_path)
+        assert os.path.dirname(default_path) != str(tmp_path)
+        assert default_path.endswith("config.json")
+    finally:
+        os.chdir(original_cwd)
+
+
 def test_custom_mappings_merge_user_and_defaults():
     """User mappings must merge with defaults, allowing overrides while retaining built-ins."""
     with tempfile.TemporaryDirectory() as tmpdir:

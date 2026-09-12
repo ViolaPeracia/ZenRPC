@@ -72,63 +72,57 @@ Local unit testing via `pytest` (15 offline tests passing without requiring Disc
   - [x] Implemented case-insensitive and `.exe`-extension-agnostic matching
   - [x] Maintained identical unrecognized process fallback (`Using <process>`)
   - [x] Added comprehensive automated parity tests in `tests/test_presence.py`
+- [x] **M2.6-W — Windows Stabilization**
+  - [x] **#1** — `[Windows] Windows runtime baseline verification`
+    - [x] Discord running before watcher starts
+    - [x] Discord offline at startup with automatic background reconnect
+    - [x] Discord closing and restarting while watcher stays alive
+    - [x] Application switching (timer reset) and window title changes (timer preserved)
+    - [x] Process replacement / exit handling
+    - [x] Lock and unlock modes via system tray
+    - [x] Live configuration reload from tray menu
+    - [x] Rate-limit interval handling and clamp (>=15s)
+    - [x] Multi-byte UTF-8 window titles
+    - [x] Tray icon visual indicator (Blurple active, Red locked)
+    - [x] Clean shutdown and presence clearing
+  - [x] **#2** — `[Windows] Windows detector reliability`
+    - [x] Guard against null / zero HWND (desktop, lock screen)
+    - [x] Safe PID validation (`pid <= 0`)
+    - [x] Handle process disappearing between PID and name lookup (`NoSuchProcess`)
+    - [x] Handle permission and access restrictions (`AccessDenied`)
+    - [x] Empty process name and empty title handling
+    - [x] Unicode title safety
+    - [x] Terminated / zombie process handling
+  - [x] **#3** — `[Windows] Windows detector unit tests`
+    - [x] Offline test suite mocking `win32gui`, `win32process`, and `psutil`
+    - [x] Valid foreground window test
+    - [x] Missing HWND / invalid PID test
+    - [x] Process disappearing / permission error branch tests
+    - [x] Empty and multibyte title tests
+    - [x] Recognized and fallback process lookup tests
+  - [x] **#4** — `[Windows] Windows launcher and startup behavior`
+    - [x] Audit `run.bat` and `install.bat`
+    - [x] Console window suppression (`ShowWindow(hwnd, 0)` and `pythonw.exe`)
+    - [x] Working-directory-independent `config.json` resolution
+    - [x] Windows Startup folder (`shell:startup`) shortcut compatibility
+  - [x] **#5** — `[Windows] Windows configuration and process-mapping parity check`
+    - [x] Parity validation across all 28 process rules and 14 Discord asset keys
+    - [x] Case-insensitive matching (`CHROME.EXE`, `code.exe`)
+    - [x] Extension-agnostic matching (`.exe` stripped or present)
+    - [x] Custom mapping merge and default preservation
+- [x] **M2.7-W — Windows Release Baseline**
+  - [x] **#6** — `[Windows] Windows end-to-end verification checklist`
+    - [x] Clean clone, dependency install, config creation, tray launch, Discord sync, and exit
+    - [x] Record verification evidence
+  - [x] **#7** — `[Windows] Windows documentation and usage verification`
+    - [x] Audit `README.md` against actual Windows implementation
+    - [x] Verify installation, run options, tray controls, and limitations
+  - [x] **#8** — `[Windows] Windows release baseline`
+    - [x] Final verification gate certifying stable source-based Windows release
 
 ---
 
-### Active Development: Windows Priority (CURRENT FOCUS)
-
-#### Milestone: M2.6-W — Windows Stabilization
-- [ ] **#1** — `[Windows] Windows runtime baseline verification`
-  - [ ] Discord running before watcher starts
-  - [ ] Discord offline at startup with automatic background reconnect
-  - [ ] Discord closing and restarting while watcher stays alive
-  - [ ] Application switching (timer reset) and window title changes (timer preserved)
-  - [ ] Process replacement / exit handling
-  - [ ] Lock and unlock modes via system tray
-  - [ ] Live configuration reload from tray menu
-  - [ ] Rate-limit interval handling and clamp (>=15s)
-  - [ ] Multi-byte UTF-8 window titles
-  - [ ] Tray icon visual indicator (Blurple active, Red locked)
-  - [ ] Clean shutdown and presence clearing
-- [ ] **#2** — `[Windows] Windows detector reliability`
-  - [ ] Guard against null / zero HWND (desktop, lock screen)
-  - [ ] Safe PID validation (`pid <= 0`)
-  - [ ] Handle process disappearing between PID and name lookup (`NoSuchProcess`)
-  - [ ] Handle permission and access restrictions (`AccessDenied`)
-  - [ ] Empty process name and empty title handling
-  - [ ] Unicode title safety
-  - [ ] Terminated / zombie process handling
-- [ ] **#3** — `[Windows] Windows detector unit tests`
-  - [ ] Offline test suite mocking `win32gui`, `win32process`, and `psutil`
-  - [ ] Valid foreground window test
-  - [ ] Missing HWND / invalid PID test
-  - [ ] Process disappearing / permission error branch tests
-  - [ ] Empty and multibyte title tests
-  - [ ] Recognized and fallback process lookup tests
-- [ ] **#4** — `[Windows] Windows launcher and startup behavior`
-  - [ ] Audit `run.bat` and `install.bat`
-  - [ ] Console window suppression (`ShowWindow(hwnd, 0)` and `pythonw.exe`)
-  - [ ] Working-directory-independent `config.json` resolution
-  - [ ] Windows Startup folder (`shell:startup`) shortcut compatibility
-- [ ] **#5** — `[Windows] Windows configuration and process-mapping parity check`
-  - [ ] Parity validation across all 28 process rules and 14 Discord asset keys
-  - [ ] Case-insensitive matching (`CHROME.EXE`, `code.exe`)
-  - [ ] Extension-agnostic matching (`.exe` stripped or present)
-  - [ ] Custom mapping merge and default preservation
-
-#### Milestone: M2.7-W — Windows Release Baseline
-- [ ] **#6** — `[Windows] Windows end-to-end verification checklist`
-  - [ ] Clean clone, dependency install, config creation, tray launch, Discord sync, and exit
-  - [ ] Record verification evidence
-- [ ] **#7** — `[Windows] Windows documentation and usage verification`
-  - [ ] Audit `README.md` against actual Windows implementation
-  - [ ] Verify installation, run options, tray controls, and limitations
-- [ ] **#8** — `[Windows] Windows release baseline`
-  - [ ] Final verification gate certifying stable source-based Windows release
-
----
-
-### Planned Development: Linux Follow-up (IMMEDIATE NEXT)
+### Active Development: Linux Priority (CURRENT FOCUS)
 
 #### Milestone: M3-L — Linux Stabilization
 - [ ] **#9** — `[Linux] Linux X11/XWayland runtime verification`
