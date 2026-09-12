@@ -172,7 +172,7 @@ Local unit testing via `pytest` (36 offline tests passing without requiring Disc
   - [ ] Zero-bloat lightweight architecture maintaining minimal memory footprint (< 50 MB RAM)
 
 #### Assets & Application Recognition
-- [ ] **#19** — `[Assets & Catalog] Missing application logos in Rich Presence and expanding recognized applications catalog`
+- [x] **#19** — `[Assets & Catalog] Missing application logos in Rich Presence and expanding recognized applications catalog`
   - [x] Document Discord Art Assets requirement (uploading named image assets to Developer Portal)
   - [x] Provide asset naming guide and bundled art asset pack (58 normalized 512x512 PNGs in `assets/art_assets/`)
   - [x] Expand recognized default application catalog (144 process rules across 58 applications including full Linux desktop support in `app/config.py` and `config.example.json`)
