@@ -42,9 +42,10 @@ ZenRPC/
 - **Compositor IPC (Sway / Hyprland):** Deferred/on-demand. Only implement if the owner actively uses one of these compositors.
 
 ## 6. Testing & Verification
-Local unit testing via `pytest` (15 offline tests passing without requiring Discord or a GUI):
-- `tests/test_config.py`: Config loading, automatic merging of built-in defaults with user custom mappings, malformed JSON fallback, rate-limit clamping (>=15s), script-relative path resolution.
-- `tests/test_presence.py`: Per-app timer resets, title-only continuity, UTF-8 byte boundary truncation (ASCII & multi-byte), lock mode semantics, worker thread persistence during Discord downtime, pre-migration process and asset key parity (28 rules across 14 asset keys), and unrecognized process fallback behavior.
+Local unit testing via `pytest` (34 offline tests passing without requiring Discord or a GUI):
+- `tests/test_config.py`: Config loading, automatic merging of built-in defaults with user custom mappings, malformed JSON fallback, rate-limit clamping (>=15s), script-relative path resolution, working-directory independence (`test_cwd_independence`).
+- `tests/test_detector.py`: Windows active-window detection tests mocking `win32gui`, `win32process`, and `psutil` covering 16+ edge cases (HWND=0/None, invalid PID, `NoSuchProcess`, `AccessDenied`, `ZombieProcess`, empty/whitespace/Unicode titles, recognized/unrecognized mappings).
+- `tests/test_presence.py`: Per-app timer resets, title-only continuity, UTF-8 byte boundary truncation (ASCII & multi-byte), lock mode semantics, worker thread persistence during Discord downtime, idle presence clearing/recovery, disconnect recovery, live config reload, tray icon colors, pre-migration process and asset key parity (28 rules across 14 asset keys + GIMP versioned variants), and unrecognized process fallback behavior.
 
 ## 7. Configuration Strategy
 - `config.example.json` is committed as the clean default template with all 28 recognized process rules.

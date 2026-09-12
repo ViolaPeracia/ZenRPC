@@ -18,6 +18,7 @@ ZenRPC/
 ├── tests/
 │   ├── conftest.py         # In-memory MockRPC fixture (offline testing)
 │   ├── test_config.py      # Configuration tests (merging, clamping, paths)
+│   ├── test_detector.py    # Offline Windows Win32 detector tests (mocked APIs)
 │   └── test_presence.py    # Presence payload, UTF-8 safety, and timer tests
 ├── docs/
 │   ├── ROADMAP.md          # Living roadmap with milestone & issue checkboxes
@@ -131,9 +132,8 @@ The presence builder (`PresenceEngine._build_presence`) resolves process names u
 
 All active and planned tasks are tracked via GitHub Milestones and mirrored in `docs/ROADMAP.md`:
 
-- **Active Milestone:** `M2.6-W — Windows Stabilization` (Issues #1–#5)
-- **Upcoming Milestone:** `M2.7-W — Windows Release Baseline` (Issues #6–#8)
-- **Planned Milestone:** `M3-L — Linux Stabilization` (Issues #9–#14)
+- **Completed Milestones:** `M1`, `M2`, `M2.5`, `M2.6-W`, `M2.7-W` (Issues #1–#8 closed)
+- **Active Milestone:** `M3-L — Linux Stabilization` (Issues #9–#14)
 - **Deferred Milestone:** `M4 — Optional Cross-Platform Features` (Issues #15–#18)
 
 When implementing changes:
