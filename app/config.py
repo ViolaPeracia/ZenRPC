@@ -500,6 +500,241 @@ DEFAULT_CONFIG = {
             "name": "Command Prompt",
             "icon": "terminal",
             "detail": "In Command Prompt"
+        },
+        "alacritty": {
+            "name": "Alacritty",
+            "icon": "alacritty",
+            "detail": "In terminal"
+        },
+        "Alacritty.exe": {
+            "name": "Alacritty",
+            "icon": "alacritty",
+            "detail": "In terminal"
+        },
+        "kitty": {
+            "name": "Kitty",
+            "icon": "kitty",
+            "detail": "In terminal"
+        },
+        "wezterm-gui": {
+            "name": "WezTerm",
+            "icon": "wezterm",
+            "detail": "In terminal"
+        },
+        "wezterm": {
+            "name": "WezTerm",
+            "icon": "wezterm",
+            "detail": "In terminal"
+        },
+        "foot": {
+            "name": "Foot",
+            "icon": "terminal",
+            "detail": "In terminal"
+        },
+        "tilix": {
+            "name": "Tilix",
+            "icon": "terminal",
+            "detail": "In terminal"
+        },
+        "xfce4-terminal": {
+            "name": "XFCE Terminal",
+            "icon": "terminal",
+            "detail": "In terminal"
+        },
+        "urxvt": {
+            "name": "URxvt",
+            "icon": "terminal",
+            "detail": "In terminal"
+        },
+        "xterm": {
+            "name": "XTerm",
+            "icon": "terminal",
+            "detail": "In terminal"
+        },
+        "chromium": {
+            "name": "Chromium",
+            "icon": "chromium",
+            "detail": "Browsing the web"
+        },
+        "chromium-browser": {
+            "name": "Chromium",
+            "icon": "chromium",
+            "detail": "Browsing the web"
+        },
+        "tor-browser": {
+            "name": "Tor Browser",
+            "icon": "tor",
+            "detail": "Browsing securely"
+        },
+        "torbrowser-launcher": {
+            "name": "Tor Browser",
+            "icon": "tor",
+            "detail": "Browsing securely"
+        },
+        "zen": {
+            "name": "Zen Browser",
+            "icon": "zen",
+            "detail": "Browsing the web"
+        },
+        "zen-bin": {
+            "name": "Zen Browser",
+            "icon": "zen",
+            "detail": "Browsing the web"
+        },
+        "zen-browser": {
+            "name": "Zen Browser",
+            "icon": "zen",
+            "detail": "Browsing the web"
+        },
+        "epiphany": {
+            "name": "GNOME Web",
+            "icon": "epiphany",
+            "detail": "Browsing the web"
+        },
+        "epiphany-browser": {
+            "name": "GNOME Web",
+            "icon": "epiphany",
+            "detail": "Browsing the web"
+        },
+        "emacs": {
+            "name": "GNU Emacs",
+            "icon": "emacs",
+            "detail": "Editing text"
+        },
+        "emacsclient": {
+            "name": "GNU Emacs",
+            "icon": "emacs",
+            "detail": "Editing text"
+        },
+        "kate": {
+            "name": "Kate",
+            "icon": "kate",
+            "detail": "Editing code"
+        },
+        "kwrite": {
+            "name": "KWrite",
+            "icon": "notepad",
+            "detail": "Writing"
+        },
+        "geany": {
+            "name": "Geany",
+            "icon": "geany",
+            "detail": "Editing code"
+        },
+        "nano": {
+            "name": "GNU nano",
+            "icon": "terminal",
+            "detail": "Editing text"
+        },
+        "mousepad": {
+            "name": "Mousepad",
+            "icon": "notepad",
+            "detail": "Writing"
+        },
+        "xed": {
+            "name": "Xed",
+            "icon": "notepad",
+            "detail": "Writing"
+        },
+        "pluma": {
+            "name": "Pluma",
+            "icon": "notepad",
+            "detail": "Writing"
+        },
+        "leafpad": {
+            "name": "Leafpad",
+            "icon": "notepad",
+            "detail": "Writing"
+        },
+        "krita": {
+            "name": "Krita",
+            "icon": "krita",
+            "detail": "Painting"
+        },
+        "inkscape": {
+            "name": "Inkscape",
+            "icon": "inkscape",
+            "detail": "Vector drawing"
+        },
+        "kdenlive": {
+            "name": "Kdenlive",
+            "icon": "kdenlive",
+            "detail": "Editing video"
+        },
+        "mpv": {
+            "name": "mpv",
+            "icon": "mpv",
+            "detail": "Watching video"
+        },
+        "audacity": {
+            "name": "Audacity",
+            "icon": "audacity",
+            "detail": "Editing audio"
+        },
+        "soffice.bin": {
+            "name": "LibreOffice",
+            "icon": "libreoffice",
+            "detail": "Office work"
+        },
+        "libreoffice": {
+            "name": "LibreOffice",
+            "icon": "libreoffice",
+            "detail": "Office work"
+        },
+        "swriter": {
+            "name": "LibreOffice Writer",
+            "icon": "word",
+            "detail": "Writing document"
+        },
+        "scalc": {
+            "name": "LibreOffice Calc",
+            "icon": "excel",
+            "detail": "Analyzing data"
+        },
+        "simpress": {
+            "name": "LibreOffice Impress",
+            "icon": "powerpoint",
+            "detail": "Designing slides"
+        },
+        "evince": {
+            "name": "Evince",
+            "icon": "evince",
+            "detail": "Reading document"
+        },
+        "okular": {
+            "name": "Okular",
+            "icon": "okular",
+            "detail": "Reading document"
+        },
+        "dolphin": {
+            "name": "Dolphin",
+            "icon": "dolphin",
+            "detail": "Browsing files"
+        },
+        "thunar": {
+            "name": "Thunar",
+            "icon": "explorer",
+            "detail": "Browsing files"
+        },
+        "nemo": {
+            "name": "Nemo",
+            "icon": "explorer",
+            "detail": "Browsing files"
+        },
+        "pcmanfm": {
+            "name": "PCManFM",
+            "icon": "explorer",
+            "detail": "Browsing files"
+        },
+        "htop": {
+            "name": "System Monitor",
+            "icon": "terminal",
+            "detail": "Monitoring system"
+        },
+        "btop": {
+            "name": "System Monitor",
+            "icon": "terminal",
+            "detail": "Monitoring system"
         }
     }
 }

@@ -108,15 +108,18 @@ Once running, **ZenRPC** lives in your system tray (notification area). Right-cl
 
 ## 📦 Supported Applications Out of the Box
 
-ZenRPC includes 97 built-in recognition rules covering 39 popular desktop applications across Windows and Linux, complete with matching 512×512 art assets in `assets/art_assets/`:
+ZenRPC includes 144 built-in recognition rules covering 58 popular desktop applications across Windows and Linux, complete with matching 512×512 art assets in `assets/art_assets/`:
 
-### 💻 Modern AI & Code Editors
+### 💻 Code Editors & IDEs
 | Application | Process Names | Discord Asset Key | Default Activity Text |
 | :--- | :--- | :--- | :--- |
 | **Cursor** | `Cursor.exe`, `cursor` | `cursor` | Editing code |
 | **Windsurf IDE** | `Windsurf.exe`, `windsurf` | `windsurf` | Editing code |
 | **Visual Studio Code** | `Code.exe`, `code` | `vscode` | Editing code / Coding |
 | **Zed** | `zed.exe`, `zed` | `zed` | Editing code |
+| **GNU Emacs** | `emacs`, `emacsclient` | `emacs` | Editing text |
+| **Kate** | `kate` | `kate` | Editing code |
+| **Geany** | `geany` | `geany` | Editing code |
 | **Sublime Text** | `sublime_text.exe`, `sublime_text` | `sublime` | Editing code |
 | **PyCharm** | `pycharm64.exe`, `pycharm.exe`, `pycharm` | `pycharm` | Editing Python |
 | **IntelliJ IDEA** | `idea64.exe`, `idea.exe`, `idea` | `idea` | Writing code |
@@ -130,11 +133,15 @@ ZenRPC includes 97 built-in recognition rules covering 39 popular desktop applic
 | :--- | :--- | :--- | :--- |
 | **Google Chrome** | `chrome.exe`, `chrome`, `google-chrome` | `chrome` | Browsing the web / Browsing |
 | **Mozilla Firefox** | `firefox.exe`, `firefox` | `firefox` | Browsing the web / Browsing |
+| **Chromium** | `chromium`, `chromium-browser` | `chromium` | Browsing the web |
+| **Zen Browser** | `zen`, `zen-bin`, `zen-browser` | `zen` | Browsing the web |
 | **Microsoft Edge** | `msedge.exe`, `msedge` | `edge` | Browsing the web |
 | **Brave Browser** | `brave.exe`, `brave` | `brave` | Browsing the web |
+| **Tor Browser** | `tor-browser`, `torbrowser-launcher` | `tor` | Browsing securely |
 | **Opera & Opera GX** | `opera.exe`, `opera`, `opera_gx.exe` | `opera` | Browsing the web |
 | **Arc Browser** | `Arc.exe`, `arc` | `arc` | Browsing the web |
 | **Vivaldi** | `vivaldi.exe`, `vivaldi` | `vivaldi` | Browsing the web |
+| **GNOME Web (Epiphany)** | `epiphany`, `epiphany-browser` | `epiphany` | Browsing the web |
 
 ### 💬 Communication & Collaboration
 | Application | Process Names | Discord Asset Key | Default Activity Text |
@@ -145,29 +152,51 @@ ZenRPC includes 97 built-in recognition rules covering 39 popular desktop applic
 | **Slack** | `slack.exe`, `slack` | `slack` | Collaborating |
 | **Microsoft Teams** | `ms-teams.exe`, `Teams.exe`, `teams` | `teams` | Meeting & Chatting |
 
-### 🎨 Productivity, Design & Office
+### 🎨 Creativity, Design & Media
 | Application | Process Names | Discord Asset Key | Default Activity Text |
 | :--- | :--- | :--- | :--- |
-| **Notion** | `Notion.exe`, `notion` | `notion` | Organizing notes |
-| **Obsidian** | `Obsidian.exe`, `obsidian` | `obsidian` | Writing notes |
-| **Figma** | `Figma.exe`, `figma` | `figma` | Designing UI/UX |
+| **Krita** | `krita` | `krita` | Painting |
+| **Inkscape** | `inkscape` | `inkscape` | Vector drawing |
 | **Blender** | `blender.exe`, `blender` | `blender` | 3D Modeling |
 | **Adobe Photoshop** | `Photoshop.exe`, `photoshop` | `photoshop` | Editing images |
 | **GIMP** | `gimp`, `gimp-2.10.exe` | `gimp` | Editing image |
-| **Microsoft Word** | `WINWORD.EXE`, `winword` | `word` | Writing document |
-| **Microsoft Excel** | `EXCEL.EXE`, `excel` | `excel` | Analyzing data |
-| **Microsoft PowerPoint** | `POWERPNT.EXE`, `powerpnt` | `powerpoint` | Designing slides |
-| **Notepad / Text Editor** | `notepad.exe`, `gedit` | `notepad` | Writing |
-| **File Explorer / Files** | `explorer.exe`, `nautilus` | `explorer` | Viewing files / Browsing files |
-
-### 🎮 Media, Gaming & System Tools
-| Application | Process Names | Discord Asset Key | Default Activity Text |
-| :--- | :--- | :--- | :--- |
+| **Figma** | `Figma.exe`, `figma` | `figma` | Designing UI/UX |
+| **Kdenlive** | `kdenlive` | `kdenlive` | Editing video |
+| **OBS Studio** | `obs64.exe`, `obs` | `obs` | Streaming |
+| **Audacity** | `audacity` | `audacity` | Editing audio |
+| **mpv** | `mpv` | `mpv` | Watching video |
 | **VLC Media Player** | `vlc.exe`, `vlc` | `vlc` | Watching video |
 | **Spotify** | `spotify.exe`, `spotify` | `spotify` | Listening to music |
 | **Steam** | `steam.exe`, `steam` | `steam` | Playing games / Gaming |
-| **OBS Studio** | `obs64.exe`, `obs` | `obs` | Streaming |
-| **System Terminal** | `WindowsTerminal.exe`, `pwsh.exe`, `powershell.exe`, `cmd.exe`, `terminal`, `gnome-terminal`, `konsole` | `terminal` | In terminal / In PowerShell / In Command Prompt |
+
+### 📄 Office, Notes & Document Viewers
+| Application | Process Names | Discord Asset Key | Default Activity Text |
+| :--- | :--- | :--- | :--- |
+| **LibreOffice Suite** | `soffice.bin`, `libreoffice` | `libreoffice` | Office work |
+| **LibreOffice Writer** | `swriter` | `word` | Writing document |
+| **LibreOffice Calc** | `scalc` | `excel` | Analyzing data |
+| **LibreOffice Impress** | `simpress` | `powerpoint` | Designing slides |
+| **Microsoft Word** | `WINWORD.EXE`, `winword` | `word` | Writing document |
+| **Microsoft Excel** | `EXCEL.EXE`, `excel` | `excel` | Analyzing data |
+| **Microsoft PowerPoint** | `POWERPNT.EXE`, `powerpnt` | `powerpoint` | Designing slides |
+| **Notion** | `Notion.exe`, `notion` | `notion` | Organizing notes |
+| **Obsidian** | `Obsidian.exe`, `obsidian` | `obsidian` | Writing notes |
+| **Evince** | `evince` | `evince` | Reading document |
+| **Okular** | `okular` | `okular` | Reading document |
+| **Text Editors** | `notepad.exe`, `gedit`, `kwrite`, `mousepad`, `xed`, `pluma`, `leafpad` | `notepad` | Writing |
+| **File Managers** | `dolphin` (KDE), `explorer.exe` (Win), `nautilus` (GNOME), `thunar` (XFCE), `nemo` (Cinnamon), `pcmanfm` (LXDE) | `dolphin` / `explorer` | Browsing files / Viewing files |
+
+### ⚡ Terminals & Command-Line
+| Application | Process Names | Discord Asset Key | Default Activity Text |
+| :--- | :--- | :--- | :--- |
+| **Alacritty** | `alacritty`, `Alacritty.exe` | `alacritty` | In terminal |
+| **Kitty** | `kitty` | `kitty` | In terminal |
+| **WezTerm** | `wezterm`, `wezterm-gui` | `wezterm` | In terminal |
+| **Windows Terminal** | `WindowsTerminal.exe`, `wt.exe` | `terminal` | In terminal |
+| **PowerShell** | `pwsh.exe`, `pwsh`, `powershell.exe`, `powershell` | `terminal` | In PowerShell |
+| **Command Prompt** | `cmd.exe`, `cmd` | `terminal` | In Command Prompt |
+| **Linux Terminals** | `terminal`, `gnome-terminal`, `konsole`, `foot`, `tilix`, `xfce4-terminal`, `urxvt`, `xterm` | `terminal` | In terminal |
+| **Terminal Utilities** | `nano` (text), `htop` / `btop` (monitoring) | `terminal` | Editing text / Monitoring system |
 
 > **Unrecognized Applications:** Any application not listed above automatically falls back to displaying `Using <process_name>` with the active window title, without crashing or failing.
 

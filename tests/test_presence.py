@@ -511,6 +511,59 @@ def test_expanded_catalog_mappings(mock_rpc_factory):
             ("powershell", "terminal", "PowerShell"),
             ("cmd.exe", "terminal", "Command Prompt"),
             ("cmd", "terminal", "Command Prompt"),
+            # Linux Terminals
+            ("alacritty", "alacritty", "Alacritty"),
+            ("Alacritty.exe", "alacritty", "Alacritty"),
+            ("kitty", "kitty", "Kitty"),
+            ("wezterm-gui", "wezterm", "WezTerm"),
+            ("wezterm", "wezterm", "WezTerm"),
+            ("foot", "terminal", "Foot"),
+            ("tilix", "terminal", "Tilix"),
+            ("xfce4-terminal", "terminal", "XFCE Terminal"),
+            ("urxvt", "terminal", "URxvt"),
+            ("xterm", "terminal", "XTerm"),
+            # Linux Browsers
+            ("chromium", "chromium", "Chromium"),
+            ("chromium-browser", "chromium", "Chromium"),
+            ("tor-browser", "tor", "Tor Browser"),
+            ("torbrowser-launcher", "tor", "Tor Browser"),
+            ("zen", "zen", "Zen Browser"),
+            ("zen-bin", "zen", "Zen Browser"),
+            ("zen-browser", "zen", "Zen Browser"),
+            ("epiphany", "epiphany", "GNOME Web"),
+            ("epiphany-browser", "epiphany", "GNOME Web"),
+            # Linux Editors
+            ("emacs", "emacs", "GNU Emacs"),
+            ("emacsclient", "emacs", "GNU Emacs"),
+            ("kate", "kate", "Kate"),
+            ("kwrite", "notepad", "KWrite"),
+            ("geany", "geany", "Geany"),
+            ("nano", "terminal", "GNU nano"),
+            ("mousepad", "notepad", "Mousepad"),
+            ("xed", "notepad", "Xed"),
+            ("pluma", "notepad", "Pluma"),
+            ("leafpad", "notepad", "Leafpad"),
+            # Linux Creative & Media
+            ("krita", "krita", "Krita"),
+            ("inkscape", "inkscape", "Inkscape"),
+            ("kdenlive", "kdenlive", "Kdenlive"),
+            ("mpv", "mpv", "mpv"),
+            ("audacity", "audacity", "Audacity"),
+            # Linux Office & Document
+            ("soffice.bin", "libreoffice", "LibreOffice"),
+            ("libreoffice", "libreoffice", "LibreOffice"),
+            ("swriter", "word", "LibreOffice Writer"),
+            ("scalc", "excel", "LibreOffice Calc"),
+            ("simpress", "powerpoint", "LibreOffice Impress"),
+            ("evince", "evince", "Evince"),
+            ("okular", "okular", "Okular"),
+            # Linux File Managers & System
+            ("dolphin", "dolphin", "Dolphin"),
+            ("thunar", "explorer", "Thunar"),
+            ("nemo", "explorer", "Nemo"),
+            ("pcmanfm", "explorer", "PCManFM"),
+            ("htop", "terminal", "System Monitor"),
+            ("btop", "terminal", "System Monitor"),
         ]
 
         for proc, expected_icon, expected_name in test_cases:
@@ -536,8 +589,8 @@ def test_art_assets_integrity():
     assert os.path.getsize(sources_doc) > 100
 
     icon_keys = {m["icon"] for m in DEFAULT_CONFIG["custom_mappings"].values()}
-    # Must cover at least 39 distinct application icons
-    assert len(icon_keys) >= 39, f"Expected at least 39 distinct icon keys, got {len(icon_keys)}"
+    # Must cover at least 58 distinct application icons
+    assert len(icon_keys) >= 58, f"Expected at least 58 distinct icon keys, got {len(icon_keys)}"
 
     for icon in icon_keys:
         png_path = os.path.join(assets_dir, f"{icon}.png")

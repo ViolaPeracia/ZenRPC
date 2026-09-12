@@ -48,6 +48,25 @@ Every asset has been independently sourced from official brand repositories, per
 | `word` | Microsoft Word | Microsoft / Wikimedia Commons | `Microsoft_Office_Word_(2019–present).svg` | Microsoft Brand |
 | `excel` | Microsoft Excel | Microsoft / Wikimedia Commons | `Microsoft_Office_Excel_(2019–present).svg` | Microsoft Brand |
 | `powerpoint` | Microsoft PowerPoint | Microsoft / Wikimedia Commons | `Microsoft_Office_PowerPoint_(2019–present).svg` | Microsoft Brand |
+| `alacritty` | Alacritty | Alacritty Project / Wikimedia Commons | `Alacritty_logo.svg` | Apache 2.0 |
+| `kitty` | Kitty | Kovid Goyal | `kovidgoyal/kitty` (logo/kitty.png) | GPLv3 |
+| `wezterm` | WezTerm | Wez Furlong | `wez/wezterm` (assets/icon/terminal.png) | MIT |
+| `emacs` | GNU Emacs | Free Software Foundation / Wikimedia Commons | `EmacsIcon.svg` | GPLv3+ |
+| `kate` | Kate | KDE e.V. / Wikimedia Commons | `Sc-apps-kate-editor.svg` | LGPL |
+| `geany` | Geany | Geany Developers / Wikimedia Commons | `Geany_logo.svg` | GPLv2 |
+| `krita` | Krita | Krita Foundation / Wikimedia Commons | `Krita-logo-plain.svg` | GPLv2+ |
+| `inkscape` | Inkscape | Inkscape Project / Wikimedia Commons | `Inkscape_Logo.svg` | GPLv2 |
+| `kdenlive` | Kdenlive | KDE e.V. / Wikimedia Commons | `Kdenlive_logo.svg` | GPLv2+ |
+| `mpv` | mpv | mpv Project / Wikimedia Commons | `Unofficial_Mpv_logo_(with_gradients).svg` | CC0 |
+| `audacity` | Audacity | Muse Group / Wikimedia Commons | `Audacity_Logo.svg` | GPLv2 |
+| `libreoffice` | LibreOffice | The Document Foundation / Dashboard Icons | `walkxcode/dashboard-icons` (png/libreoffice.png) | MPL 2.0 |
+| `chromium` | Chromium | The Chromium Authors / Wikimedia Commons | `Chromium_11_Logo.svg` | BSD |
+| `tor` | Tor Browser | The Tor Project / Wikimedia Commons | `Tor_Browser_icon.svg` | BSD-3-Clause |
+| `zen` | Zen Browser | Zen Browser Authors / Wikimedia Commons | `Zen_Browser_logo_(red_circles).svg` | MPL 2.0 |
+| `epiphany` | GNOME Web (Epiphany) | GNOME Project / Wikimedia Commons | `GNOME_Web_logo_(2021-03).svg` | GPLv3 |
+| `dolphin` | Dolphin | KDE e.V. / Wikimedia Commons | `Dolphin-icon.svg` | LGPL |
+| `evince` | Evince | GNOME Project / Wikimedia Commons | `Evince_logo.svg` | GPLv2 |
+| `okular` | Okular | KDE e.V. / Wikimedia Commons | `KDE-graphics-viewer-document.svg` | GPLv2 |
 
 ## Specifications
 * **Dimensions:** 512 × 512 pixels
