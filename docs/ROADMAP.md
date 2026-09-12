@@ -157,6 +157,26 @@ Local unit testing via `pytest` (34 offline tests passing without requiring Disc
 - [ ] **#17** — `[Cross-platform] Persistent file logging` (Rotating local log file)
 - [ ] **#18** — `[Cross-platform] Optional standalone packaging` (PyInstaller single-file build)
 
+---
+
+### Mini-Milestones & Enhancements
+
+#### Milestone: M-GUI — Lightweight Desktop GUI Dashboard
+- [ ] **#20** — `[GUI] Lightweight desktop GUI dashboard for status monitoring and configuration`
+  - [ ] Real-time Discord presence profile card preview (app name, icon, details, state, live elapsed timer)
+  - [ ] Connection status indicator (Connected / Reconnecting / Disconnected)
+  - [ ] Quick action toggles: Enable/Disable RPC, Lock/Unlock presence, Reload config
+  - [ ] Visual application mapping manager & running process picker for custom apps
+  - [ ] Visual settings configuration (Client ID, update interval slider >=15s, idle toggle)
+  - [ ] Window minimize-to-tray on close (`X`) and restore on tray click
+  - [ ] Zero-bloat lightweight architecture maintaining minimal memory footprint (< 50 MB RAM)
+
+#### Assets & Application Recognition
+- [ ] **#19** — `[Assets & Catalog] Missing application logos in Rich Presence and expanding recognized applications catalog`
+  - [ ] Document Discord Art Assets requirement (uploading named image assets to Developer Portal)
+  - [ ] Provide asset naming guide and bundled art asset pack
+  - [ ] Expand recognized default application catalog (modern IDEs, media players, browsers, creative tools)
+
 
 
 ## 9. Python vs. Rust Decision Gate
