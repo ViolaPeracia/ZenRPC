@@ -42,10 +42,10 @@ ZenRPC/
 - **Compositor IPC (Sway / Hyprland):** Deferred/on-demand. Only implement if the owner actively uses one of these compositors.
 
 ## 6. Testing & Verification
-Local unit testing via `pytest` (34 offline tests passing without requiring Discord or a GUI):
+Local unit testing via `pytest` (36 offline tests passing without requiring Discord or a GUI):
 - `tests/test_config.py`: Config loading, automatic merging of built-in defaults with user custom mappings, malformed JSON fallback, rate-limit clamping (>=15s), script-relative path resolution, working-directory independence (`test_cwd_independence`).
 - `tests/test_detector.py`: Windows active-window detection tests mocking `win32gui`, `win32process`, and `psutil` covering 16+ edge cases (HWND=0/None, invalid PID, `NoSuchProcess`, `AccessDenied`, `ZombieProcess`, empty/whitespace/Unicode titles, recognized/unrecognized mappings).
-- `tests/test_presence.py`: Per-app timer resets, title-only continuity, UTF-8 byte boundary truncation (ASCII & multi-byte), lock mode semantics, worker thread persistence during Discord downtime, idle presence clearing/recovery, disconnect recovery, live config reload, tray icon colors, pre-migration process and asset key parity (28 rules across 14 asset keys + GIMP versioned variants), and unrecognized process fallback behavior.
+- `tests/test_presence.py`: Per-app timer resets, title-only continuity, UTF-8 byte boundary truncation (ASCII & multi-byte), lock mode semantics, worker thread persistence during Discord downtime, idle presence clearing/recovery, disconnect recovery, live config reload, tray icon colors, expanded catalog recognition (97 rules across 39 applications), art assets integrity (all 39 512x512 PNGs validated), and unrecognized process fallback behavior.
 
 ## 7. Configuration Strategy
 - `config.example.json` is committed as the clean default template with all 28 recognized process rules.
@@ -172,10 +172,11 @@ Local unit testing via `pytest` (34 offline tests passing without requiring Disc
   - [ ] Zero-bloat lightweight architecture maintaining minimal memory footprint (< 50 MB RAM)
 
 #### Assets & Application Recognition
-- [ ] **#19** — `[Assets & Catalog] Missing application logos in Rich Presence and expanding recognized applications catalog`
-  - [ ] Document Discord Art Assets requirement (uploading named image assets to Developer Portal)
-  - [ ] Provide asset naming guide and bundled art asset pack
-  - [ ] Expand recognized default application catalog (modern IDEs, media players, browsers, creative tools)
+- [x] **#19** — `[Assets & Catalog] Missing application logos in Rich Presence and expanding recognized applications catalog`
+  - [x] Document Discord Art Assets requirement (uploading named image assets to Developer Portal)
+  - [x] Provide asset naming guide and bundled art asset pack (39 normalized 512x512 PNGs in `assets/art_assets/`)
+  - [x] Expand recognized default application catalog (97 process rules across 39 applications in `app/config.py` and `config.example.json`)
+  - [x] Automated unit and integrity tests verifying all process mappings and asset files
 
 
 

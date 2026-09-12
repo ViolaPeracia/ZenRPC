@@ -423,4 +423,131 @@ def test_tray_icon_colors():
     assert locked_icon.getpixel((32, 32)) == (255, 255, 255, 255)
 
 
+def test_expanded_catalog_mappings(mock_rpc_factory):
+    """
+    Verifies that all newly added applications in Issue #19 produce the expected
+    large_image asset keys and application names, with case-insensitivity and
+    extension-agnostic matching.
+    """
+    with tempfile.TemporaryDirectory() as tmpdir:
+        cfg_path = os.path.join(tmpdir, "config.json")
+        save_config({"client_id": "123456789"}, cfg_path)
+        engine = PresenceEngine(config_path=cfg_path, rpc_factory=mock_rpc_factory)
+        assert engine.connect() is True
+
+        test_cases = [
+            # Editors & IDEs
+            ("Cursor.exe", "cursor", "Cursor"),
+            ("cursor", "cursor", "Cursor"),
+            ("CURSOR.EXE", "cursor", "Cursor"),
+            ("Windsurf.exe", "windsurf", "Windsurf"),
+            ("windsurf", "windsurf", "Windsurf"),
+            ("sublime_text.exe", "sublime", "Sublime Text"),
+            ("sublime_text", "sublime", "Sublime Text"),
+            ("pycharm64.exe", "pycharm", "PyCharm"),
+            ("pycharm.exe", "pycharm", "PyCharm"),
+            ("pycharm", "pycharm", "PyCharm"),
+            ("idea64.exe", "idea", "IntelliJ IDEA"),
+            ("idea.exe", "idea", "IntelliJ IDEA"),
+            ("idea", "idea", "IntelliJ IDEA"),
+            ("webstorm64.exe", "webstorm", "WebStorm"),
+            ("webstorm.exe", "webstorm", "WebStorm"),
+            ("webstorm", "webstorm", "WebStorm"),
+            ("rider64.exe", "rider", "JetBrains Rider"),
+            ("rider.exe", "rider", "JetBrains Rider"),
+            ("rider", "rider", "JetBrains Rider"),
+            ("devenv.exe", "visualstudio", "Visual Studio"),
+            ("devenv", "visualstudio", "Visual Studio"),
+            ("nvim.exe", "neovim", "Neovim"),
+            ("nvim", "neovim", "Neovim"),
+            ("gvim.exe", "neovim", "Vim"),
+            ("vim.exe", "neovim", "Vim"),
+            ("vim", "neovim", "Vim"),
+            # Browsers
+            ("msedge.exe", "edge", "Microsoft Edge"),
+            ("msedge", "edge", "Microsoft Edge"),
+            ("MSEDGE.EXE", "edge", "Microsoft Edge"),
+            ("brave.exe", "brave", "Brave Browser"),
+            ("brave", "brave", "Brave Browser"),
+            ("opera.exe", "opera", "Opera"),
+            ("opera", "opera", "Opera"),
+            ("opera_gx.exe", "opera", "Opera GX"),
+            ("Arc.exe", "arc", "Arc"),
+            ("arc", "arc", "Arc"),
+            ("vivaldi.exe", "vivaldi", "Vivaldi"),
+            ("vivaldi", "vivaldi", "Vivaldi"),
+            # Communication & Social
+            ("Telegram.exe", "telegram", "Telegram"),
+            ("telegram-desktop", "telegram", "Telegram"),
+            ("telegram", "telegram", "Telegram"),
+            ("Zalo.exe", "zalo", "Zalo"),
+            ("zalo", "zalo", "Zalo"),
+            ("slack.exe", "slack", "Slack"),
+            ("slack", "slack", "Slack"),
+            ("ms-teams.exe", "teams", "Microsoft Teams"),
+            ("Teams.exe", "teams", "Microsoft Teams"),
+            ("teams", "teams", "Microsoft Teams"),
+            # Productivity & Design
+            ("Notion.exe", "notion", "Notion"),
+            ("notion", "notion", "Notion"),
+            ("Obsidian.exe", "obsidian", "Obsidian"),
+            ("obsidian", "obsidian", "Obsidian"),
+            ("Figma.exe", "figma", "Figma"),
+            ("figma", "figma", "Figma"),
+            ("blender.exe", "blender", "Blender"),
+            ("blender", "blender", "Blender"),
+            ("WINWORD.EXE", "word", "Microsoft Word"),
+            ("winword", "word", "Microsoft Word"),
+            ("EXCEL.EXE", "excel", "Microsoft Excel"),
+            ("excel", "excel", "Microsoft Excel"),
+            ("POWERPNT.EXE", "powerpoint", "Microsoft PowerPoint"),
+            ("powerpnt", "powerpoint", "Microsoft PowerPoint"),
+            # System Terminals
+            ("WindowsTerminal.exe", "terminal", "Windows Terminal"),
+            ("wt.exe", "terminal", "Windows Terminal"),
+            ("pwsh.exe", "terminal", "PowerShell"),
+            ("pwsh", "terminal", "PowerShell"),
+            ("powershell.exe", "terminal", "PowerShell"),
+            ("powershell", "terminal", "PowerShell"),
+            ("cmd.exe", "terminal", "Command Prompt"),
+            ("cmd", "terminal", "Command Prompt"),
+        ]
+
+        for proc, expected_icon, expected_name in test_cases:
+            presence = engine._build_presence(proc, "Active Window", 1000)
+            assert presence.get("large_image") == expected_icon, f"Failed icon for {proc}: {presence}"
+            assert presence.get("large_text") == expected_name, f"Failed name for {proc}: {presence}"
+
+
+def test_art_assets_integrity():
+    """
+    Verifies that every icon asset key defined across custom mappings exists in
+    assets/art_assets/ as a valid 512x512 RGBA PNG.
+    """
+    from PIL import Image
+    from app.config import DEFAULT_CONFIG
+
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    assets_dir = os.path.join(base_dir, "assets", "art_assets")
+    assert os.path.isdir(assets_dir), f"Missing art_assets directory at {assets_dir}"
+
+    sources_doc = os.path.join(assets_dir, "SOURCES.md")
+    assert os.path.isfile(sources_doc), f"Missing SOURCES.md at {sources_doc}"
+    assert os.path.getsize(sources_doc) > 100
+
+    icon_keys = {m["icon"] for m in DEFAULT_CONFIG["custom_mappings"].values()}
+    # Must cover at least 39 distinct application icons
+    assert len(icon_keys) >= 39, f"Expected at least 39 distinct icon keys, got {len(icon_keys)}"
+
+    for icon in icon_keys:
+        png_path = os.path.join(assets_dir, f"{icon}.png")
+        assert os.path.isfile(png_path), f"Missing art asset for icon key '{icon}' at {png_path}"
+        assert os.path.getsize(png_path) > 1000, f"Asset '{icon}.png' is suspiciously small"
+
+        with Image.open(png_path) as im:
+            assert im.size == (512, 512), f"Asset '{icon}.png' dimension is {im.size}, expected (512, 512)"
+            assert im.mode == "RGBA", f"Asset '{icon}.png' mode is {im.mode}, expected 'RGBA'"
+
+
+
 

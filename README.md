@@ -108,26 +108,108 @@ Once running, **ZenRPC** lives in your system tray (notification area). Right-cl
 
 ## 📦 Supported Applications Out of the Box
 
-ZenRPC includes 28 built-in recognition rules covering 14 popular desktop tools across Windows and Linux:
+ZenRPC includes 97 built-in recognition rules covering 39 popular desktop applications across Windows and Linux, complete with matching 512×512 art assets in `assets/art_assets/`:
 
+### 💻 Modern AI & Code Editors
 | Application | Process Names | Discord Asset Key | Default Activity Text |
 | :--- | :--- | :--- | :--- |
+| **Cursor** | `Cursor.exe`, `cursor` | `cursor` | Editing code |
+| **Windsurf IDE** | `Windsurf.exe`, `windsurf` | `windsurf` | Editing code |
 | **Visual Studio Code** | `Code.exe`, `code` | `vscode` | Editing code / Coding |
+| **Zed** | `zed.exe`, `zed` | `zed` | Editing code |
+| **Sublime Text** | `sublime_text.exe`, `sublime_text` | `sublime` | Editing code |
+| **PyCharm** | `pycharm64.exe`, `pycharm.exe`, `pycharm` | `pycharm` | Editing Python |
+| **IntelliJ IDEA** | `idea64.exe`, `idea.exe`, `idea` | `idea` | Writing code |
+| **WebStorm** | `webstorm64.exe`, `webstorm.exe`, `webstorm` | `webstorm` | Writing JavaScript |
+| **JetBrains Rider** | `rider64.exe`, `rider.exe`, `rider` | `rider` | Developing .NET |
+| **Visual Studio IDE** | `devenv.exe`, `devenv` | `visualstudio` | Developing software |
+| **Neovim / Vim** | `nvim.exe`, `nvim`, `gvim.exe`, `vim.exe`, `vim` | `neovim` | Editing text |
+
+### 🌐 Web Browsers
+| Application | Process Names | Discord Asset Key | Default Activity Text |
+| :--- | :--- | :--- | :--- |
 | **Google Chrome** | `chrome.exe`, `chrome`, `google-chrome` | `chrome` | Browsing the web / Browsing |
 | **Mozilla Firefox** | `firefox.exe`, `firefox` | `firefox` | Browsing the web / Browsing |
+| **Microsoft Edge** | `msedge.exe`, `msedge` | `edge` | Browsing the web |
+| **Brave Browser** | `brave.exe`, `brave` | `brave` | Browsing the web |
+| **Opera & Opera GX** | `opera.exe`, `opera`, `opera_gx.exe` | `opera` | Browsing the web |
+| **Arc Browser** | `Arc.exe`, `arc` | `arc` | Browsing the web |
+| **Vivaldi** | `vivaldi.exe`, `vivaldi` | `vivaldi` | Browsing the web |
+
+### 💬 Communication & Collaboration
+| Application | Process Names | Discord Asset Key | Default Activity Text |
+| :--- | :--- | :--- | :--- |
 | **Discord** | `discord.exe`, `discord` | `discord` | Chatting |
+| **Telegram** | `Telegram.exe`, `telegram-desktop`, `telegram` | `telegram` | Chatting |
+| **Zalo** | `Zalo.exe`, `zalo` | `zalo` | Chatting |
+| **Slack** | `slack.exe`, `slack` | `slack` | Collaborating |
+| **Microsoft Teams** | `ms-teams.exe`, `Teams.exe`, `teams` | `teams` | Meeting & Chatting |
+
+### 🎨 Productivity, Design & Office
+| Application | Process Names | Discord Asset Key | Default Activity Text |
+| :--- | :--- | :--- | :--- |
+| **Notion** | `Notion.exe`, `notion` | `notion` | Organizing notes |
+| **Obsidian** | `Obsidian.exe`, `obsidian` | `obsidian` | Writing notes |
+| **Figma** | `Figma.exe`, `figma` | `figma` | Designing UI/UX |
+| **Blender** | `blender.exe`, `blender` | `blender` | 3D Modeling |
+| **Adobe Photoshop** | `Photoshop.exe`, `photoshop` | `photoshop` | Editing images |
+| **GIMP** | `gimp`, `gimp-2.10.exe` | `gimp` | Editing image |
+| **Microsoft Word** | `WINWORD.EXE`, `winword` | `word` | Writing document |
+| **Microsoft Excel** | `EXCEL.EXE`, `excel` | `excel` | Analyzing data |
+| **Microsoft PowerPoint** | `POWERPNT.EXE`, `powerpnt` | `powerpoint` | Designing slides |
 | **Notepad / Text Editor** | `notepad.exe`, `gedit` | `notepad` | Writing |
 | **File Explorer / Files** | `explorer.exe`, `nautilus` | `explorer` | Viewing files / Browsing files |
-| **Adobe Photoshop** | `Photoshop.exe`, `photoshop` | `photoshop` | Editing images |
-| **GIMP** | `gimp` | `gimp` | Editing image |
+
+### 🎮 Media, Gaming & System Tools
+| Application | Process Names | Discord Asset Key | Default Activity Text |
+| :--- | :--- | :--- | :--- |
 | **VLC Media Player** | `vlc.exe`, `vlc` | `vlc` | Watching video |
 | **Spotify** | `spotify.exe`, `spotify` | `spotify` | Listening to music |
 | **Steam** | `steam.exe`, `steam` | `steam` | Playing games / Gaming |
 | **OBS Studio** | `obs64.exe`, `obs` | `obs` | Streaming |
-| **Zed** | `zed.exe`, `zed` | `zed` | Editing code |
-| **Terminal** | `terminal`, `gnome-terminal`, `konsole` | `terminal` | In terminal |
+| **System Terminal** | `WindowsTerminal.exe`, `pwsh.exe`, `powershell.exe`, `cmd.exe`, `terminal`, `gnome-terminal`, `konsole` | `terminal` | In terminal / In PowerShell / In Command Prompt |
 
 > **Unrecognized Applications:** Any application not listed above automatically falls back to displaying `Using <process_name>` with the active window title, without crashing or failing.
+
+---
+
+## 🖼️ Setting Up Discord Art Assets (Developer Portal Guide)
+
+### Why Don't Icons Appear by Default?
+Discord Rich Presence operates on an **isolated application model**. When ZenRPC broadcasts presence, it tells Discord:
+```json
+{
+  "assets": {
+    "large_image": "vscode",
+    "large_text": "Visual Studio Code"
+  }
+}
+```
+Discord does **not** fetch third-party icons from the web automatically. Instead, it looks up the key `"vscode"` inside the **Art Assets** uploaded to your specific Application ID. If your Application has no assets uploaded under that key, Discord renders the activity text but leaves the icon slot empty.
+
+To make icons appear on your profile, you simply upload the matching icon files provided in this repository to your Discord Application.
+
+### Step-by-Step Walkthrough
+
+1. Open the [Discord Developer Portal](https://discord.com/developers/applications) and log in.
+2. Select your Application (the one matching the `client_id` in your `config.json`).
+3. In the left sidebar, navigate to **Rich Presence** → **Art Assets**.
+4. Click **Add Image(s)**.
+5. Select the icons from the [`assets/art_assets/`](assets/art_assets/) folder in this repository:
+   * Every file is pre-normalized to **512 × 512 PNG** with transparency.
+   * **Crucial:** Ensure the **Asset Name** in Discord exactly matches the file's base name (e.g. name `vscode.png` as `vscode`, `chrome.png` as `chrome`, `edge.png` as `edge`).
+6. Click **Save Changes** at the bottom of the page.
+
+> [!NOTE]
+> **CDN Propagation:** Discord caches art assets across global CDN servers. It may take **2 to 10 minutes** after saving before newly uploaded assets appear on your active profile card.
+
+### Technical Note: Art Assets vs. External Image URLs
+During investigation of Discord Rich Presence capabilities, Discord client RPC does permit passing raw HTTPS URLs into `large_image`. However, external URLs introduce several significant drawbacks:
+* They require public image hosting with valid CORS and direct image MIME types.
+* They trigger rate-limiting or thumbnail proxying delays through Discord's media proxy (`mp:external/...`).
+* If the external host experiences downtime or network blocking, the presence icon silently breaks.
+
+Uploading assets directly to the **Discord Developer Portal** remains the official, zero-latency, and 100% reliable standard for desktop Rich Presence. For asset provenance, licenses, and sources, see [`assets/art_assets/SOURCES.md`](assets/art_assets/SOURCES.md).
 
 ---
 
@@ -211,6 +293,8 @@ pytest
   - Windows automatically places new tray icons in the taskbar overflow area. Click the **^** arrow in your taskbar to reveal the ZenRPC icon, and drag it into the taskbar tray.
 - **Python Not Found on Windows:**
   - Re-run the Python installer from [python.org](https://www.python.org/downloads/) and ensure **"Add python.exe to PATH"** is checked.
+- **Application Logo / Icon Not Appearing in Discord Profile:**
+  - Discord does not bundle third-party application icons automatically. You must upload the matching icon files from [`assets/art_assets/`](assets/art_assets/) into the **Discord Developer Portal** under your application's **Rich Presence → Art Assets** settings. See the [Developer Portal Guide](#️-setting-up-discord-art-assets-developer-portal-guide) above.
 - **Presence Update Delay:**
   - Discord enforces a 15-second rate limit on rich presence updates. Setting `"update_interval"` lower than `15` in `config.json` is automatically clamped to `15` seconds to prevent rate-limit bans.
 

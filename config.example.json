@@ -149,6 +149,346 @@
       "name": "Terminal",
       "icon": "terminal",
       "detail": "In terminal"
+    },
+    "Cursor.exe": {
+      "name": "Cursor",
+      "icon": "cursor",
+      "detail": "Editing code"
+    },
+    "cursor": {
+      "name": "Cursor",
+      "icon": "cursor",
+      "detail": "Editing code"
+    },
+    "Windsurf.exe": {
+      "name": "Windsurf",
+      "icon": "windsurf",
+      "detail": "Editing code"
+    },
+    "windsurf": {
+      "name": "Windsurf",
+      "icon": "windsurf",
+      "detail": "Editing code"
+    },
+    "sublime_text.exe": {
+      "name": "Sublime Text",
+      "icon": "sublime",
+      "detail": "Editing code"
+    },
+    "sublime_text": {
+      "name": "Sublime Text",
+      "icon": "sublime",
+      "detail": "Editing code"
+    },
+    "pycharm64.exe": {
+      "name": "PyCharm",
+      "icon": "pycharm",
+      "detail": "Editing Python"
+    },
+    "pycharm.exe": {
+      "name": "PyCharm",
+      "icon": "pycharm",
+      "detail": "Editing Python"
+    },
+    "pycharm": {
+      "name": "PyCharm",
+      "icon": "pycharm",
+      "detail": "Editing Python"
+    },
+    "idea64.exe": {
+      "name": "IntelliJ IDEA",
+      "icon": "idea",
+      "detail": "Writing code"
+    },
+    "idea.exe": {
+      "name": "IntelliJ IDEA",
+      "icon": "idea",
+      "detail": "Writing code"
+    },
+    "idea": {
+      "name": "IntelliJ IDEA",
+      "icon": "idea",
+      "detail": "Writing code"
+    },
+    "webstorm64.exe": {
+      "name": "WebStorm",
+      "icon": "webstorm",
+      "detail": "Writing JavaScript"
+    },
+    "webstorm.exe": {
+      "name": "WebStorm",
+      "icon": "webstorm",
+      "detail": "Writing JavaScript"
+    },
+    "webstorm": {
+      "name": "WebStorm",
+      "icon": "webstorm",
+      "detail": "Writing JavaScript"
+    },
+    "rider64.exe": {
+      "name": "JetBrains Rider",
+      "icon": "rider",
+      "detail": "Developing .NET"
+    },
+    "rider.exe": {
+      "name": "JetBrains Rider",
+      "icon": "rider",
+      "detail": "Developing .NET"
+    },
+    "rider": {
+      "name": "JetBrains Rider",
+      "icon": "rider",
+      "detail": "Developing .NET"
+    },
+    "devenv.exe": {
+      "name": "Visual Studio",
+      "icon": "visualstudio",
+      "detail": "Developing software"
+    },
+    "devenv": {
+      "name": "Visual Studio",
+      "icon": "visualstudio",
+      "detail": "Developing software"
+    },
+    "nvim.exe": {
+      "name": "Neovim",
+      "icon": "neovim",
+      "detail": "Editing text"
+    },
+    "nvim": {
+      "name": "Neovim",
+      "icon": "neovim",
+      "detail": "Editing text"
+    },
+    "gvim.exe": {
+      "name": "Vim",
+      "icon": "neovim",
+      "detail": "Editing text"
+    },
+    "vim.exe": {
+      "name": "Vim",
+      "icon": "neovim",
+      "detail": "Editing text"
+    },
+    "vim": {
+      "name": "Vim",
+      "icon": "neovim",
+      "detail": "Editing text"
+    },
+    "msedge.exe": {
+      "name": "Microsoft Edge",
+      "icon": "edge",
+      "detail": "Browsing the web"
+    },
+    "msedge": {
+      "name": "Microsoft Edge",
+      "icon": "edge",
+      "detail": "Browsing the web"
+    },
+    "brave.exe": {
+      "name": "Brave Browser",
+      "icon": "brave",
+      "detail": "Browsing the web"
+    },
+    "brave": {
+      "name": "Brave Browser",
+      "icon": "brave",
+      "detail": "Browsing the web"
+    },
+    "opera.exe": {
+      "name": "Opera",
+      "icon": "opera",
+      "detail": "Browsing the web"
+    },
+    "opera": {
+      "name": "Opera",
+      "icon": "opera",
+      "detail": "Browsing the web"
+    },
+    "opera_gx.exe": {
+      "name": "Opera GX",
+      "icon": "opera",
+      "detail": "Browsing the web"
+    },
+    "Arc.exe": {
+      "name": "Arc",
+      "icon": "arc",
+      "detail": "Browsing the web"
+    },
+    "arc": {
+      "name": "Arc",
+      "icon": "arc",
+      "detail": "Browsing the web"
+    },
+    "vivaldi.exe": {
+      "name": "Vivaldi",
+      "icon": "vivaldi",
+      "detail": "Browsing the web"
+    },
+    "vivaldi": {
+      "name": "Vivaldi",
+      "icon": "vivaldi",
+      "detail": "Browsing the web"
+    },
+    "Telegram.exe": {
+      "name": "Telegram",
+      "icon": "telegram",
+      "detail": "Chatting"
+    },
+    "telegram-desktop": {
+      "name": "Telegram",
+      "icon": "telegram",
+      "detail": "Chatting"
+    },
+    "telegram": {
+      "name": "Telegram",
+      "icon": "telegram",
+      "detail": "Chatting"
+    },
+    "Zalo.exe": {
+      "name": "Zalo",
+      "icon": "zalo",
+      "detail": "Chatting"
+    },
+    "zalo": {
+      "name": "Zalo",
+      "icon": "zalo",
+      "detail": "Chatting"
+    },
+    "slack.exe": {
+      "name": "Slack",
+      "icon": "slack",
+      "detail": "Collaborating"
+    },
+    "slack": {
+      "name": "Slack",
+      "icon": "slack",
+      "detail": "Collaborating"
+    },
+    "ms-teams.exe": {
+      "name": "Microsoft Teams",
+      "icon": "teams",
+      "detail": "Meeting & Chatting"
+    },
+    "Teams.exe": {
+      "name": "Microsoft Teams",
+      "icon": "teams",
+      "detail": "Meeting & Chatting"
+    },
+    "teams": {
+      "name": "Microsoft Teams",
+      "icon": "teams",
+      "detail": "Meeting & Chatting"
+    },
+    "Notion.exe": {
+      "name": "Notion",
+      "icon": "notion",
+      "detail": "Organizing notes"
+    },
+    "notion": {
+      "name": "Notion",
+      "icon": "notion",
+      "detail": "Organizing notes"
+    },
+    "Obsidian.exe": {
+      "name": "Obsidian",
+      "icon": "obsidian",
+      "detail": "Writing notes"
+    },
+    "obsidian": {
+      "name": "Obsidian",
+      "icon": "obsidian",
+      "detail": "Writing notes"
+    },
+    "Figma.exe": {
+      "name": "Figma",
+      "icon": "figma",
+      "detail": "Designing UI/UX"
+    },
+    "figma": {
+      "name": "Figma",
+      "icon": "figma",
+      "detail": "Designing UI/UX"
+    },
+    "blender.exe": {
+      "name": "Blender",
+      "icon": "blender",
+      "detail": "3D Modeling"
+    },
+    "blender": {
+      "name": "Blender",
+      "icon": "blender",
+      "detail": "3D Modeling"
+    },
+    "WINWORD.EXE": {
+      "name": "Microsoft Word",
+      "icon": "word",
+      "detail": "Writing document"
+    },
+    "winword": {
+      "name": "Microsoft Word",
+      "icon": "word",
+      "detail": "Writing document"
+    },
+    "EXCEL.EXE": {
+      "name": "Microsoft Excel",
+      "icon": "excel",
+      "detail": "Analyzing data"
+    },
+    "excel": {
+      "name": "Microsoft Excel",
+      "icon": "excel",
+      "detail": "Analyzing data"
+    },
+    "POWERPNT.EXE": {
+      "name": "Microsoft PowerPoint",
+      "icon": "powerpoint",
+      "detail": "Designing slides"
+    },
+    "powerpnt": {
+      "name": "Microsoft PowerPoint",
+      "icon": "powerpoint",
+      "detail": "Designing slides"
+    },
+    "WindowsTerminal.exe": {
+      "name": "Windows Terminal",
+      "icon": "terminal",
+      "detail": "In terminal"
+    },
+    "wt.exe": {
+      "name": "Windows Terminal",
+      "icon": "terminal",
+      "detail": "In terminal"
+    },
+    "pwsh.exe": {
+      "name": "PowerShell",
+      "icon": "terminal",
+      "detail": "In PowerShell"
+    },
+    "pwsh": {
+      "name": "PowerShell",
+      "icon": "terminal",
+      "detail": "In PowerShell"
+    },
+    "powershell.exe": {
+      "name": "PowerShell",
+      "icon": "terminal",
+      "detail": "In PowerShell"
+    },
+    "powershell": {
+      "name": "PowerShell",
+      "icon": "terminal",
+      "detail": "In PowerShell"
+    },
+    "cmd.exe": {
+      "name": "Command Prompt",
+      "icon": "terminal",
+      "detail": "In Command Prompt"
+    },
+    "cmd": {
+      "name": "Command Prompt",
+      "icon": "terminal",
+      "detail": "In Command Prompt"
     }
   }
 }
