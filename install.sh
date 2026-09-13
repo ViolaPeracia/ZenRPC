@@ -19,12 +19,12 @@ else
     VENV_DIR="$APP_DIR/.venv"
     if [ ! -d "$VENV_DIR" ]; then
         echo "  [*] Creating virtual environment in .venv..."
-        if ! python3 -m venv "$VENV_DIR" 2>/dev/null; then
+        if ! python3 -m venv --system-site-packages "$VENV_DIR" 2>/dev/null; then
             echo "  [!] Failed to create virtual environment using 'python3 -m venv'."
             echo "      Please ensure python3-venv is installed:"
-            echo "        Debian/Ubuntu: sudo apt install python3-venv"
-            echo "        Fedora:        sudo dnf install python3-virtualenv"
-            echo "        Arch/CachyOS:  sudo pacman -S python"
+            echo "        Debian/Ubuntu: sudo apt install python3-venv python3-gi gir1.2-ayatanaappindicator3-0.1"
+            echo "        Fedora:        sudo dnf install python3-virtualenv python3-gobject libayatana-appindicator-gtk3"
+            echo "        Arch/CachyOS:  sudo pacman -S python python-gobject libayatana-appindicator"
             exit 1
         fi
         echo "  [OK] Created virtual environment (.venv)."

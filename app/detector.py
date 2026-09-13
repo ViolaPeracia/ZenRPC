@@ -174,6 +174,11 @@ def _get_active_niri(timeout=1):
     if isinstance(pid, int) and pid > 0:
         proc_name = _get_linux_process_name(pid)
 
+    # If Niri reports the XWayland server/bridge process itself,
+    # delegate to xdotool to resolve the real X11 client window and PID.
+    if proc_name in ("xwayland", "xwayland-satellite"):
+        return None, None
+
     if not proc_name and app_id and isinstance(app_id, str):
         clean_app = app_id.strip().lower()
         if clean_app:

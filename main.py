@@ -8,6 +8,25 @@ import sys
 import threading
 import time
 
+# Ensure PyGObject (gi) from system site-packages is discoverable inside virtualenvs
+# so that pystray can use the modern libayatana-appindicator / Gtk backend for menus on Linux.
+if sys.platform.startswith("linux"):
+    try:
+        import gi
+    except ImportError:
+        ver = f"python{sys.version_info.major}.{sys.version_info.minor}"
+        candidates = [
+            f"/usr/lib/{ver}/site-packages",
+            f"/usr/lib64/{ver}/site-packages",
+            f"/usr/local/lib/{ver}/site-packages",
+            f"/usr/lib/{ver}/dist-packages",
+            f"/usr/local/lib/{ver}/dist-packages",
+        ]
+        for p in candidates:
+            if os.path.isdir(os.path.join(p, "gi")) and p not in sys.path:
+                sys.path.append(p)
+                break
+
 from PIL import Image, ImageDraw
 from pystray import Icon, Menu, MenuItem
 
@@ -181,6 +200,13 @@ def run_tray(config_path=None):
 
     tray = Icon("ZenRPC", make_icon(), "ZenRPC", menu)
     _active_tray[0] = tray
+    if not getattr(tray, "HAS_MENU", True):
+        logger.warning(
+            "System tray backend '%s' does not support context menus (HAS_MENU=False). "
+            "Install python-gobject and libayatana-appindicator for tray menu support.",
+            tray.__module__,
+        )
+    logger.info("System tray initialized using %s (HAS_MENU=%s).", tray.__module__, getattr(tray, "HAS_MENU", False))
 
     # Start engine in background and enter tray loop
     engine.start()
@@ -239,10 +265,16 @@ def run_gui(config_path=None):
         )
 
         tray = Icon("ZenRPC", make_icon(), "ZenRPC Dashboard", tray_menu)
+        if not getattr(tray, "HAS_MENU", True):
+            logger.warning(
+                "System tray backend '%s' does not support context menus (HAS_MENU=False). "
+                "Install python-gobject and libayatana-appindicator for tray menu support.",
+                tray.__module__,
+            )
         tray_thread = threading.Thread(target=tray.run, daemon=True)
         tray_thread.start()
         _active_tray[0] = tray
-        logger.info("System tray icon initialized.")
+        logger.info("System tray icon initialized using %s (HAS_MENU=%s).", tray.__module__, getattr(tray, "HAS_MENU", False))
     except Exception as e:
         logger.info("System tray not available or failed to initialize: %s", e)
         _active_tray[0] = None

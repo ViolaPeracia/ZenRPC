@@ -65,11 +65,16 @@ To display rich presence on Discord, you need a free Discord Application ID:
 
 #### 🐧 Linux Setup
  
- 1. **Install system requirement** for X11 active-window inspection:
+ 1. **Install system requirements** for window inspection, GUI dashboard, and system tray menu:
     ```bash
-    sudo apt install xdotool         # Debian / Ubuntu / Mint
-    # or: sudo pacman -S xdotool    # Arch Linux / Manjaro
-    # or: sudo dnf install xdotool   # Fedora
+    # Debian / Ubuntu / Mint
+    sudo apt install xdotool python3-tk python3-gi gir1.2-ayatanaappindicator3-0.1
+
+    # Arch Linux / CachyOS / Manjaro
+    sudo pacman -S xdotool tk python-gobject libayatana-appindicator
+
+    # Fedora
+    sudo dnf install xdotool python3-tkinter python3-gobject libayatana-appindicator-gtk3
     ```
  2. **Run the installer:**
     ```bash

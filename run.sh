@@ -12,6 +12,16 @@ if [ -d "$HOME/.local/lib" ]; then
     export LD_LIBRARY_PATH="$HOME/.local/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 fi
 
+# Ensure system PyGObject (gi) is discoverable for tray menu support on Linux
+if [ -z "$PYTHONPATH" ]; then
+    PYVER="$(python3 -c 'import sys; print(f"python{sys.version_info.major}.{sys.version_info.minor}")' 2>/dev/null || echo "python3")"
+    if [ -d "/usr/lib/$PYVER/site-packages/gi" ]; then
+        export PYTHONPATH="/usr/lib/$PYVER/site-packages"
+    elif [ -d "/usr/lib64/$PYVER/site-packages/gi" ]; then
+        export PYTHONPATH="/usr/lib64/$PYVER/site-packages"
+    fi
+fi
+
 if [ -n "$VIRTUAL_ENV" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
     PYTHON="$VIRTUAL_ENV/bin/python"
 elif [ -x "$APP_DIR/.venv/bin/python" ]; then

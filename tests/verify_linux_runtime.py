@@ -543,6 +543,12 @@ def main():
         "Starting Linux X11/XWayland Runtime Verification on DISPLAY=%s",
         os.environ.get("DISPLAY", ":1"),
     )
+
+    # In X11/XWayland test harness, bypass native Wayland compositor IPC so external
+    # developer desktop windows do not interfere with synthetic X11 window lifecycle.
+    import app.detector
+    app.detector._get_active_niri = lambda timeout=1: (None, None)
+
     temp_dir = tempfile.mkdtemp(prefix="zenrpc_verify_")
     cfg_path = make_test_config(temp_dir)
 
