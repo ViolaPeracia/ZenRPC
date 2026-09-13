@@ -239,3 +239,59 @@ def test_unrecognized_process_presence_fallback(mock_win32_env, mock_rpc_factory
     assert "large_image" not in update
     assert update["details"] == "Using proprietary_cad_tool"
     assert update["state"] == "Blueprint v1.0"
+
+
+def test_windows_terminal_dataflow_and_switch_behavior(mock_win32_env, mock_rpc_factory, tmp_path):
+    """
+    Verifies that Windows Terminal running a subshell (e.g. .venv\\Scripts\\pythonw.exe)
+    is accurately detected as WindowsTerminal.exe with the tab title as state,
+    and cleanly transitions when switching to another application and back.
+    """
+    from app.config import save_config
+    cfg_path = str(tmp_path / "config.json")
+    save_config({"client_id": "123456789"}, cfg_path)
+
+    # 1. Start with Windows Terminal in foreground
+    mock_win32_env["process_instance"].name.return_value = "WindowsTerminal.exe"
+    mock_win32_env["gui"].GetWindowText.return_value = ".venv\\Scripts\\pythonw.exe"
+
+    engine = PresenceEngine(
+        config_path=cfg_path,
+        detector_fn=detector.get_active_window_info,
+        rpc_factory=mock_rpc_factory,
+    )
+    assert engine.connect() is True
+    engine.update_once()
+
+    rpc = mock_rpc_factory.instances[0]
+    assert len(rpc.updates) == 1
+    u1 = rpc.updates[0]
+    assert u1["details"] == "In terminal"
+    assert u1["large_image"] == "terminal"
+    assert u1["large_text"] == "Windows Terminal"
+    assert u1["state"] == ".venv\\Scripts\\pythonw.exe"
+
+    # 2. Switch foreground to Visual Studio Code
+    mock_win32_env["process_instance"].name.return_value = "Code.exe"
+    mock_win32_env["gui"].GetWindowText.return_value = "test.py - Visual Studio Code"
+
+    engine.update_once()
+    assert len(rpc.updates) == 2
+    u2 = rpc.updates[1]
+    assert u2["large_image"] == "vscode"
+    assert u2["large_text"] == "Visual Studio Code"
+    assert u2["details"] == "Editing code"
+    assert u2["state"] == "test.py - Visual Studio Code"
+
+    # 3. Switch back to Windows Terminal
+    mock_win32_env["process_instance"].name.return_value = "WindowsTerminal.exe"
+    mock_win32_env["gui"].GetWindowText.return_value = "PowerShell 7"
+
+    engine.update_once()
+    assert len(rpc.updates) == 3
+    u3 = rpc.updates[2]
+    assert u3["details"] == "In terminal"
+    assert u3["large_image"] == "terminal"
+    assert u3["large_text"] == "Windows Terminal"
+    assert u3["state"] == "PowerShell 7"
+
