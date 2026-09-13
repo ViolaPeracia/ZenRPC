@@ -24,7 +24,7 @@ The M3-L milestone stabilizes ZenRPC on Linux systems across X11 and XWayland en
 ### 2.1 Linux Process Detection Hardening (`app/detector.py`)
 
 #### A. Command Execution Safety (`_run_cmd`)
-- Executes command with strict timeout (`timeout=2`).
+- Executes command with a single default strict timeout (`timeout=2`).
 - Catches:
   - `subprocess.TimeoutExpired`: returns `""`
   - `subprocess.CalledProcessError`: returns `""`
@@ -44,33 +44,37 @@ The M3-L milestone stabilizes ZenRPC on Linux systems across X11 and XWayland en
     - Strips whitespace.
     - If valid and non-empty, returns lowercased name.
 - Secondary fallback (`/proc/<pid>/comm`):
-  - Used if `cmdline` is missing, empty (e.g. kernel threads, zombies), or yields an empty name.
+  - Always attempted if `cmdline` fails, is unreadable, is empty (e.g. kernel threads, zombies), or yields an empty name.
   - Read as UTF-8 string with `errors="ignore"`.
+  - Catches `ProcessLookupError`, `FileNotFoundError`, `PermissionError`, `OSError`.
   - Strips whitespace/newlines.
   - If valid and non-empty, returns lowercased name.
-- If both attempts fail to produce a non-empty name, returns `None` (indicates process cannot be resolved, treated as no active process).
+- If both attempts fail to produce a non-empty name, returns `None`.
 
 #### C. Active Window Detection (`_get_active_linux()`)
 - Calls `_run_cmd(["xdotool", "getactivewindow"], timeout=2)`.
 - If `win_id` is empty or not numeric/valid:
-  - Returns `None, None`.
-- Queries window title: `_run_cmd(["xdotool", "getwindowname", win_id], timeout=2)`.
-  - If title query fails or times out, safely falls back to `""` (empty string).
-  - Preserves full Unicode / multi-byte characters.
-- Queries window PID: `_run_cmd(["xdotool", "getwindowpid", win_id], timeout=2)`.
-  - If PID is empty, not digits, or `int(pid_str) <= 0`: returns `None, None`.
-  - Resolves process name via `_get_linux_process_name(int(pid_str))`.
-  - If process name is `None` or empty: returns `None, None`.
-- Returns `(proc_name, title)`.
-
-#### D. Wayland Detection & Fallback (`is_wayland()`)
-- Helper `is_wayland()`:
-  - Checks `bool(os.environ.get("WAYLAND_DISPLAY") or os.environ.get("XDG_SESSION_TYPE") == "wayland")`.
-- In `_get_active_linux()`:
-  - If `xdotool` fails or returns empty under Wayland, logs at debug level:
+  - If Wayland session is detected, logs at debug level:
     `"Wayland session detected and no active X11/XWayland window found; falling back to idle."`
   - Returns `None, None`.
-  - Does NOT crash, hang, or spawn compositor IPC.
+- If `win_id` is present (including XWayland windows running within a Wayland session):
+  - Queries window title: `_run_cmd(["xdotool", "getwindowname", win_id], timeout=2)`.
+    - If title query fails or times out, safely falls back to `""` (empty string).
+    - Preserves full Unicode / multi-byte characters.
+  - Queries window PID: `_run_cmd(["xdotool", "getwindowpid", win_id], timeout=2)`.
+    - If PID is empty, not digits, or `int(pid_str) <= 0`: returns `None, None`.
+    - Resolves process name via `_get_linux_process_name(int(pid_str))`.
+    - If process name is `None` or empty: returns `None, None`.
+  - Returns `(proc_name, title)`.
+
+#### D. Wayland Boundary Definition
+- Helper `is_wayland()`:
+  - Checks `bool(os.environ.get("WAYLAND_DISPLAY") or os.environ.get("XDG_SESSION_TYPE") == "wayland")`.
+- Active window resolution:
+  - XWayland is fully supported whenever `xdotool` successfully queries the active window, even inside Wayland.
+  - Pure Wayland sessions or Wayland windows where `xdotool` cannot detect active windows gracefully degrade to idle `(None, None)` without crashing or hanging.
+  - No compositor-specific IPC (Hyprland, Sway, Niri) is introduced in M3-L.
+  - `python-xlib` is used strictly for offline verification / harness tests and is NOT added as a runtime dependency in `requirements.txt`.
 
 ---
 
