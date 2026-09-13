@@ -379,3 +379,163 @@ def test_linux_presence_integration_unrecognized(mock_rpc_factory, tmp_path, mon
     assert "large_image" not in update
     assert update["details"] == "Using custom_linux_tool"
     assert update["state"] == "Diagram v1"
+
+
+# ============================================================================
+# Niri Native Wayland Focused Window Detection Tests (_get_active_niri)
+# ============================================================================
+
+
+def test_niri_valid_focused_window_with_pid():
+    """Simulates niri msg --json returning valid window and resolves process from PID."""
+    fake_json = b'{"id": 8, "title": "Orca Editor", "app_id": "orca", "pid": 9331}'
+    with patch("subprocess.check_output", return_value=fake_json) as mock_cmd:
+        with patch.object(detector, "_get_linux_process_name", return_value="orca-ide"):
+            proc, title = detector._get_active_niri()
+            assert proc == "orca-ide"
+            assert title == "Orca Editor"
+            mock_cmd.assert_called_once_with(
+                ["niri", "msg", "--json", "focused-window"],
+                stderr=subprocess.DEVNULL,
+                timeout=1,
+            )
+
+
+def test_niri_valid_focused_window_fallback_to_app_id():
+    """Simulates niri msg with PID that cannot be resolved in /proc, falling back to app_id."""
+    fake_json = b'{"id": 9, "title": "Web Browser", "app_id": "Google-Chrome", "pid": 5678}'
+    with patch("subprocess.check_output", return_value=fake_json):
+        with patch.object(detector, "_get_linux_process_name", return_value=None):
+            proc, title = detector._get_active_niri()
+            assert proc == "google-chrome"
+            assert title == "Web Browser"
+
+
+def test_niri_valid_focused_window_no_pid():
+    """Simulates niri msg with null/missing PID, falling back to app_id."""
+    fake_json = b'{"id": 10, "title": "Terminal", "app_id": "foot", "pid": null}'
+    with patch("subprocess.check_output", return_value=fake_json):
+        proc, title = detector._get_active_niri()
+        assert proc == "foot"
+        assert title == "Terminal"
+
+
+def test_niri_cli_missing_file_not_found():
+    """Simulates niri binary not installed on system (FileNotFoundError)."""
+    with patch("subprocess.check_output", side_effect=FileNotFoundError("No such file or directory")):
+        proc, title = detector._get_active_niri()
+        assert proc is None
+        assert title is None
+
+
+def test_niri_timeout():
+    """Simulates niri msg timing out (TimeoutExpired) <= 1s."""
+    with patch("subprocess.check_output", side_effect=subprocess.TimeoutExpired(cmd=["niri"], timeout=1)):
+        proc, title = detector._get_active_niri()
+        assert proc is None
+        assert title is None
+
+
+def test_niri_called_process_error():
+    """Simulates niri msg exiting non-zero (e.g. no focused window or niri not running)."""
+    with patch("subprocess.check_output", side_effect=subprocess.CalledProcessError(returncode=1, cmd=["niri"])):
+        proc, title = detector._get_active_niri()
+        assert proc is None
+        assert title is None
+
+
+def test_niri_malformed_json():
+    """Simulates invalid or non-JSON output from niri."""
+    with patch("subprocess.check_output", return_value=b"Error: Niri is not running\n"):
+        proc, title = detector._get_active_niri()
+        assert proc is None
+        assert title is None
+
+
+def test_niri_empty_or_non_dict_json():
+    """Simulates empty stdout or non-dictionary JSON payloads (null, array)."""
+    with patch("subprocess.check_output", return_value=b""):
+        assert detector._get_active_niri() == (None, None)
+
+    with patch("subprocess.check_output", return_value=b"null"):
+        assert detector._get_active_niri() == (None, None)
+
+    with patch("subprocess.check_output", return_value=b"[]"):
+        assert detector._get_active_niri() == (None, None)
+
+
+def test_niri_missing_app_id_and_proc():
+    """Simulates JSON payload without valid PID and without app_id."""
+    fake_json = b'{"id": 11, "title": "Untitled Window", "app_id": "", "pid": null}'
+    with patch("subprocess.check_output", return_value=fake_json):
+        proc, title = detector._get_active_niri()
+        assert proc is None
+        assert title is None
+
+
+def test_niri_empty_or_whitespace_title():
+    """Simulates null or whitespace window title returning empty string for title."""
+    fake_json = b'{"id": 12, "title": "   ", "app_id": "ghostty", "pid": 1234}'
+    with patch("subprocess.check_output", return_value=fake_json):
+        with patch.object(detector, "_get_linux_process_name", return_value="ghostty"):
+            proc, title = detector._get_active_niri()
+            assert proc == "ghostty"
+            assert title == ""
+
+
+def test_get_active_linux_prefers_niri_on_wayland(monkeypatch):
+    """Verifies _get_active_linux prioritizes Niri detection on Wayland before xdotool."""
+    monkeypatch.setenv("WAYLAND_DISPLAY", "wayland-1")
+    with patch.object(detector, "_get_active_niri", return_value=("code", "ZenRPC - VS Code")) as mock_niri:
+        with patch.object(detector, "_run_cmd") as mock_xdotool:
+            proc, title = detector._get_active_linux()
+            assert proc == "code"
+            assert title == "ZenRPC - VS Code"
+            mock_niri.assert_called_once()
+            mock_xdotool.assert_not_called()
+
+
+def test_get_active_linux_falls_back_to_xdotool_when_niri_fails(monkeypatch):
+    """Verifies _get_active_linux falls back to xdotool on Wayland when Niri returns (None, None)."""
+    monkeypatch.setenv("WAYLAND_DISPLAY", "wayland-1")
+
+    def fake_run_cmd(cmd, timeout=2):
+        if "getactivewindow" in cmd:
+            return "999"
+        elif "getwindowname" in cmd:
+            return "XWayland Window"
+        elif "getwindowpid" in cmd:
+            return "4444"
+        return ""
+
+    with patch.object(detector, "_get_active_niri", return_value=(None, None)) as mock_niri:
+        with patch.object(detector, "_run_cmd", side_effect=fake_run_cmd) as mock_xdotool:
+            with patch.object(detector, "_get_linux_process_name", return_value="xwayland-app"):
+                proc, title = detector._get_active_linux()
+                assert proc == "xwayland-app"
+                assert title == "XWayland Window"
+                mock_niri.assert_called_once()
+                assert mock_xdotool.call_count >= 1
+
+
+def test_get_active_linux_skips_niri_on_x11(monkeypatch):
+    """Verifies pure X11 session skips Niri detection entirely and goes directly to xdotool."""
+    monkeypatch.delenv("WAYLAND_DISPLAY", raising=False)
+    monkeypatch.setenv("XDG_SESSION_TYPE", "x11")
+
+    def fake_run_cmd(cmd, timeout=2):
+        if "getactivewindow" in cmd:
+            return "111"
+        elif "getwindowname" in cmd:
+            return "X11 Window"
+        elif "getwindowpid" in cmd:
+            return "2222"
+        return ""
+
+    with patch.object(detector, "_get_active_niri") as mock_niri:
+        with patch.object(detector, "_run_cmd", side_effect=fake_run_cmd):
+            with patch.object(detector, "_get_linux_process_name", return_value="x11-app"):
+                proc, title = detector._get_active_linux()
+                assert proc == "x11-app"
+                assert title == "X11 Window"
+                mock_niri.assert_not_called()

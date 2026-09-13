@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import subprocess
@@ -105,7 +106,7 @@ def _run_cmd(cmd, timeout=2):
         return ""
     except FileNotFoundError:
         global _LINUX_TOOLS_WARNED
-        if not _LINUX_TOOLS_WARNED:
+        if not _LINUX_TOOLS_WARNED and (cmd and cmd[0] == "xdotool"):
             tool_name = cmd[0] if cmd else "command"
             logger.warning("Required tool '%s' not found on system PATH.", tool_name)
             _LINUX_TOOLS_WARNED = True
@@ -146,12 +147,57 @@ def _get_linux_process_name(pid):
     return None
 
 
+def _get_active_niri(timeout=1):
+    """
+    Detects the active/focused window on Niri Wayland compositor using:
+    niri msg --json focused-window
+    Returns (process_name, window_title) or (None, None).
+    """
+    raw_json = _run_cmd(["niri", "msg", "--json", "focused-window"], timeout=timeout)
+    if not raw_json:
+        return None, None
+
+    try:
+        data = json.loads(raw_json)
+    except (json.JSONDecodeError, Exception) as e:
+        logger.debug("Failed to parse Niri JSON output: %s", e)
+        return None, None
+
+    if not isinstance(data, dict):
+        return None, None
+
+    pid = data.get("pid")
+    app_id = data.get("app_id")
+    raw_title = data.get("title")
+
+    proc_name = None
+    if isinstance(pid, int) and pid > 0:
+        proc_name = _get_linux_process_name(pid)
+
+    if not proc_name and app_id and isinstance(app_id, str):
+        clean_app = app_id.strip().lower()
+        if clean_app:
+            proc_name = clean_app
+
+    if not proc_name:
+        return None, None
+
+    title = str(raw_title).strip() if raw_title else ""
+    return proc_name, title
+
+
 def _get_active_linux():
     """
-    Detects active window on Linux via X11 (xdotool).
-    On pure Wayland sessions where xdotool cannot query active windows,
-    gracefully returns (None, None).
+    Detects active window on Linux.
+    Prioritizes Niri native Wayland IPC if running in a Wayland session.
+    Falls back to X11 / XWayland via xdotool.
+    On pure Wayland sessions where neither succeeds, gracefully returns (None, None).
     """
+    if is_wayland():
+        niri_proc, niri_title = _get_active_niri()
+        if niri_proc:
+            return niri_proc, niri_title
+
     win_id = _run_cmd(["xdotool", "getactivewindow"], timeout=2)
     if not win_id or not win_id.isdigit() or int(win_id) <= 0:
         if is_wayland():
