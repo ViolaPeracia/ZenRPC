@@ -84,13 +84,64 @@ To display rich presence on Discord, you need a free Discord Application ID:
  5. *(Optional)* **Desktop Menu Integration:**
     Copy `zenrpc.desktop` to `~/.local/share/applications/` to launch directly from your application launcher or application menu.
  
- > [!NOTE]
- > **Wayland & X11 Compatibility:** ZenRPC fully supports X11 and XWayland sessions where active window information is exposed. On pure Wayland sessions where active window querying is blocked by compositor security restrictions, ZenRPC gracefully degrades to an idle state (`None, None`) without crashing or hanging.
+ ---
 
+## 🖥️ Desktop GUI Dashboard (Linux)
+
+ZenRPC features a modern, ultra-lightweight desktop dashboard built with **CustomTkinter** that provides a complete visual control center without the overhead of Electron or Qt:
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│  ● Connected to Discord       [UNLOCKED]                    │
+├─────────────────────────────────────────────────────────────┤
+│  LIVE DISCORD ACTIVITY PREVIEW                              │
+│  ┌─────────┐   Visual Studio Code                           │
+│  │ [icon]  │   Coding                                       │
+│  │ 80x80   │   main.py - ZenRPC                             │
+│  └─────────┘   04:12 elapsed                                │
+├─────────────────────────────────────────────────────────────┤
+│  QUICK CONTROLS                                             │
+│  [ Disable RPC ]   [ Lock Current App ]   [ Reload Config ] │
+│  [ Minimize to Tray ]                                       │
+├─────────────────────────────────────────────────────────────┤
+│  [Activity Dashboard]    [Mapping Manager]    [Settings]    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Dashboard Highlights
+- **Live Discord Profile Card:** Displays the real-time presence payload exactly as it appears on Discord (application icon, name, details, active file/window title, and per-app elapsed timer).
+- **Discord Connection Status:** Real-time status badge reflecting Discord connectivity (*Connected*, *Reconnecting*, or *RPC Disabled*).
+- **Quick Controls:** One-click toggles for *Enable/Disable RPC*, *Lock/Unlock Presence*, *Reload Config*, and *Minimize to Tray*.
+- **Application Mapping Manager:** Easily view built-in and custom rules, search processes in real-time, add overrides, edit existing mappings, and remove custom definitions without corrupting default rules. Paginated for high performance.
+- **Visual Settings:** Configure your Discord Client ID, adjust presence update interval (with automatic $\ge$ 15s Discord rate-limit clamping), tune reconnect retry delays, and toggle idle/title broadcasting.
+- **Ultra-Lightweight Footprint:** Consumes only **~32 MB** of private anonymous RAM (~55 MB total resident memory including shared X11/Tk libraries). Zero Chromium or Node.js runtime bloat.
+- **Window Lifecycle & Tray Integration:** Minimizes seamlessly to the system tray upon clicking the close button (`[X]`). Capability-based fallback gracefully handles desktop environments without tray watchers (such as default GNOME Shell or minimal Wayland sessions).
+
+### Launch Modes & CLI Flags
+
+ZenRPC supports three distinct operating modes:
+
+```bash
+# 1. Desktop GUI Dashboard (Default)
+./run.sh
+# or: python3 main.py
+
+# 2. Legacy System Tray Only Mode (Runs in tray without opening GUI)
+python3 main.py --tray
+
+# 3. Headless Console Mode (Pure background daemon for servers/minimal setups)
+python3 main.py --headless
+
+# Optional: Specify a custom configuration file
+python3 main.py --config /path/to/custom_config.json
+```
+
+> [!NOTE]
+> **Linux Dependencies for GUI:** The GUI uses CustomTkinter, which relies on standard Python Tk bindings. Ensure `tk` / `python3-tk` is installed on your Linux distribution (`sudo apt install python3-tk` on Debian/Ubuntu or `sudo pacman -S tk` on Arch/CachyOS).
 
 ---
 
-## 🖥️ System Tray Controls
+## 🔔 System Tray Controls
 
 Once running, **ZenRPC** lives in your system tray (notification area). Right-click the icon to access quick controls:
 

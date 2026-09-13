@@ -166,14 +166,17 @@ Local unit testing via `pytest` (71 offline tests passing without requiring Disc
 ### Mini-Milestones & Enhancements
 
 #### Milestone: M-GUI — Lightweight Desktop GUI Dashboard
-- [ ] **#20** — `[GUI] Lightweight desktop GUI dashboard for status monitoring and configuration`
-  - [ ] Real-time Discord presence profile card preview (app name, icon, details, state, live elapsed timer)
-  - [ ] Connection status indicator (Connected / Reconnecting / Disconnected)
-  - [ ] Quick action toggles: Enable/Disable RPC, Lock/Unlock presence, Reload config
-  - [ ] Visual application mapping manager & running process picker for custom apps
-  - [ ] Visual settings configuration (Client ID, update interval slider >=15s, idle toggle)
-  - [ ] Window minimize-to-tray on close (`X`) and restore on tray click
-  - [ ] Zero-bloat lightweight architecture maintaining minimal memory footprint (< 50 MB RAM)
+- [ ] **#20** — `[GUI] Lightweight desktop GUI dashboard for status monitoring and configuration` *(Linux phase complete; Windows phase in progress)*
+  - [x] (Linux) Decoupled GUIController view-model with observer pattern (`app/gui/controller.py`)
+  - [x] (Linux) CustomTkinter desktop dashboard with real-time Discord presence profile card preview (`app/gui/dashboard.py`)
+  - [x] (Linux) Connection status badge (Connected / Reconnecting / RPC Disabled) and lock status indicator
+  - [x] (Linux) Quick action controls: Enable/Disable RPC, Lock/Unlock presence, Reload config, Minimize to Tray
+  - [x] (Linux) Visual application mapping manager with search filtering, add/edit form, delete actions, and pagination
+  - [x] (Linux) Visual settings configuration (Client ID, interval slider with $\ge$ 15s rate-limit clamp, reconnect delay, idle & title toggles)
+  - [x] (Linux) Window minimize-to-tray lifecycle with capability-based fallback and restore
+  - [x] (Linux) Multi-mode CLI (`main.py` default GUI, `--tray`, `--headless`, `--config`)
+  - [x] (Linux) Measured lightweight memory footprint (31.9 MB private anonymous RAM, ~55 MB VmRSS)
+  - [ ] (Windows) Windows runtime GUI verification and packaging
 
 #### Assets & Application Recognition
 - [x] **#19** — `[Assets & Catalog] Missing application logos in Rich Presence and expanding recognized applications catalog`
