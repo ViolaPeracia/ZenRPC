@@ -64,26 +64,29 @@ To display rich presence on Discord, you need a free Discord Application ID:
 ---
 
 #### 🐧 Linux Setup
-
-1. **Install system requirement** for X11 active-window inspection:
-   ```bash
-   sudo apt install xdotool         # Debian / Ubuntu / Mint
-   # or: sudo pacman -S xdotool    # Arch Linux / Manjaro
-   # or: sudo dnf install xdotool   # Fedora
-   ```
-2. **Run the installer:**
-   ```bash
-   chmod +x install.sh
-   ./install.sh
-   ```
-3. **Configure your Client ID:**
-   Edit `config.json` and enter your Discord `client_id`.
-4. **Start ZenRPC:**
+ 
+ 1. **Install system requirement** for X11 active-window inspection:
     ```bash
-    python3 main.py
+    sudo apt install xdotool         # Debian / Ubuntu / Mint
+    # or: sudo pacman -S xdotool    # Arch Linux / Manjaro
+    # or: sudo dnf install xdotool   # Fedora
     ```
+ 2. **Run the installer:**
+    ```bash
+    chmod +x install.sh
+    ./install.sh
+    ```
+ 3. **Configure your Client ID:**
+    Edit `config.json` and enter your Discord `client_id`.
+ 4. **Start ZenRPC:**
+    - **Launcher Script:** `./run.sh` (launches ZenRPC with virtual environment detection from any directory).
+    - **Direct Python:** `python3 main.py`
  5. *(Optional)* **Desktop Menu Integration:**
-    Copy `zenrpc.desktop` to `~/.local/share/applications/` to launch from your desktop application launcher.
+    Copy `zenrpc.desktop` to `~/.local/share/applications/` to launch directly from your application launcher or application menu.
+ 
+ > [!NOTE]
+ > **Wayland & X11 Compatibility:** ZenRPC fully supports X11 and XWayland sessions where active window information is exposed. On pure Wayland sessions where active window querying is blocked by compositor security restrictions, ZenRPC gracefully degrades to an idle state (`None, None`) without crashing or hanging.
+
 
 ---
 

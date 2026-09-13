@@ -132,12 +132,12 @@ The presence builder (`PresenceEngine._build_presence`) resolves process names u
 
 All active and planned tasks are tracked via GitHub Milestones and mirrored in `docs/ROADMAP.md`:
 
-- **Completed Milestones:** `M1`, `M2`, `M2.5`, `M2.6-W`, `M2.7-W` (Issues #1–#8 closed)
-- **Active Milestone:** `M3-L — Linux Stabilization` (Issues #9–#14)
+- **Completed Milestones:** `M1`, `M2`, `M2.5`, `M2.6-W`, `M2.7-W`, `M3-L` (Issues #1–#14 closed)
+- **Active Milestone:** `M-GUI — Lightweight Desktop GUI Dashboard` (Issue #20)
 - **Deferred Milestone:** `M4 — Optional Cross-Platform Features` (Issues #15–#18)
 
 When implementing changes:
-1. Always run `pytest` before and after modifying code.
+1. Always run `pytest` before and after modifying code (all 71 offline tests must pass).
 2. Keep platform-specific code strictly inside `app/detector.py`.
-3. Preserve all 28 existing process rules and 14 asset keys.
+3. Preserve all existing process rules and Discord asset keys.
 4. Check off completed items in `docs/ROADMAP.md`.

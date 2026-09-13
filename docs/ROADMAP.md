@@ -42,10 +42,12 @@ ZenRPC/
 - **Compositor IPC (Sway / Hyprland):** Deferred/on-demand. Only implement if the owner actively uses one of these compositors.
 
 ## 6. Testing & Verification
-Local unit testing via `pytest` (36 offline tests passing without requiring Discord or a GUI):
-- `tests/test_config.py`: Config loading, automatic merging of built-in defaults with user custom mappings, malformed JSON fallback, rate-limit clamping (>=15s), script-relative path resolution, working-directory independence (`test_cwd_independence`).
+Local unit testing via `pytest` (71 offline tests passing without requiring Discord or a GUI):
+- `tests/test_config.py`: Config loading, automatic merging of built-in defaults with user custom mappings, malformed JSON fallback, rate-limit clamping (>=15s), script-relative path resolution, working-directory independence (`test_cwd_independence`, `test_external_cwd_subprocess_resolution`, `test_run_sh_script_cwd_independence`, `test_run_sh_execution_from_external_cwd`, and `test_desktop_entry_syntax_and_exec`).
 - `tests/test_detector.py`: Windows active-window detection tests mocking `win32gui`, `win32process`, and `psutil` covering 16+ edge cases (HWND=0/None, invalid PID, `NoSuchProcess`, `AccessDenied`, `ZombieProcess`, empty/whitespace/Unicode titles, recognized/unrecognized mappings).
-- `tests/test_presence.py`: Per-app timer resets, title-only continuity, UTF-8 byte boundary truncation (ASCII & multi-byte), lock mode semantics, worker thread persistence during Discord downtime, idle presence clearing/recovery, disconnect recovery, live config reload, tray icon colors, expanded catalog recognition (144 rules across 58 applications), art assets integrity (all 58 512x512 PNGs validated), and unrecognized process fallback behavior.
+- `tests/test_linux_detector.py`: Comprehensive Linux subprocess safety and procfs boundary tests (31 tests mocking `_run_cmd`, `subprocess.check_output`, and `/proc` files, covering `xdotool` timeouts, non-zero exits, missing binaries, invalid/missing PIDs, process disappearance before `/proc` read, permission errors, malformed `cmdline`, fallback to `comm`, multibyte Unicode titles, empty titles, Wayland graceful degradation to idle, and public `get_active_window_info()` dispatch).
+- `tests/test_presence.py`: Per-app timer resets, title-only continuity, UTF-8 byte boundary truncation (ASCII & multi-byte), lock mode semantics, worker thread persistence during Discord downtime, idle presence clearing/recovery, disconnect recovery, live config reload, tray icon colors, expanded catalog recognition (including Orca and 144 rules across 59 applications), art assets integrity (all 59 512x512 PNGs validated), and unrecognized process fallback behavior.
+- `tests/verify_linux_runtime.py`: Live Linux X11/XWayland runtime verification harness validating real foreground-window detection on DISPLAY=:1, 2-second timeouts, multibyte Unicode titles, timer preservation on title changes, timer resets on app switching, window destroy idle clearing, and clean SIGINT/SIGTERM shutdown.
 
 ## 7. Configuration Strategy
 - `config.example.json` is committed as the clean default template with all 144 recognized process rules.
@@ -123,29 +125,31 @@ Local unit testing via `pytest` (36 offline tests passing without requiring Disc
 
 ---
 
-### Active Development: Linux Priority (CURRENT FOCUS)
-
-#### Milestone: M3-L — Linux Stabilization
-- [ ] **#9** — `[Linux] Linux X11/XWayland runtime verification`
-  - [ ] `xdotool` active window ID and PID resolution on physical X11/XWayland desktop
-  - [ ] Application switching and timer resets
-  - [ ] Title changes and timer preservation
-  - [ ] Subprocess timeout enforcement (no hanging external calls)
-- [ ] **#10** — `[Linux] Linux process detection reliability`
-  - [ ] Direct `/proc/<pid>/cmdline` parsing to bypass comm 15-character truncation
-  - [ ] Handle terminated processes, malformed data, and sandboxed `/proc`
-  - [ ] Secondary fallback to `/proc/<pid>/comm`
-- [ ] **#11** — `[Linux] Linux subprocess safety tests`
-  - [ ] Offline unit tests mocking `subprocess.check_output`
-  - [ ] Subprocess timeout expired, command not found, and non-zero exit coverage
-- [ ] **#12** — `[Linux] Linux desktop launcher verification`
-  - [ ] Audit `zenrpc.desktop` path and working directory execution
-  - [ ] Application menu launcher testing
-- [ ] **#13** — `[Linux] Linux native Wayland behavior and documentation`
-  - [ ] Graceful degradation to idle on pure Wayland sessions without crashing
-  - [ ] Support boundary clarification (X11 vs XWayland vs pure Wayland)
-- [ ] **#14** — `[Linux] Linux release baseline`
-  - [ ] Final verification gate certifying stable source-based Linux release
+- [x] **M3-L — Linux Stabilization**
+  - [x] **#9** — `[Linux] Linux X11/XWayland runtime verification`
+    - [x] `xdotool` active window ID and PID resolution on physical X11/XWayland desktop (`DISPLAY=:1`)
+    - [x] Application switching and timer resets
+    - [x] Title changes and timer preservation
+    - [x] Subprocess timeout enforcement (strict 2s timeout, no hanging calls)
+    - [x] Verified via `tests/verify_linux_runtime.py` covering all 10 runtime checks
+  - [x] **#10** — `[Linux] Linux process detection reliability`
+    - [x] Direct `/proc/<pid>/cmdline` binary parsing extracting argv basename
+    - [x] Handle terminated processes, malformed data, and sandboxed `/proc`
+    - [x] Secondary fallback to `/proc/<pid>/comm`
+    - [x] Return `None` on resolution failure to cleanly isolate from `PresenceEngine`
+  - [x] **#11** — `[Linux] Linux subprocess safety tests`
+    - [x] 31 offline unit tests in `tests/test_linux_detector.py` mocking `_run_cmd`, subprocess, and `/proc`
+    - [x] Subprocess timeout expired, command not found, non-zero exit, and Unicode coverage
+  - [x] **#12** — `[Linux] Linux desktop launcher verification`
+    - [x] CWD-independent root launcher `run.sh` resolving `APP_DIR` dynamically
+    - [x] Validated `zenrpc.desktop` desktop file syntax conforming to FreeDesktop KeyFile specs
+    - [x] Automated CWD independence tests in `tests/test_config.py`
+  - [x] **#13** — `[Linux] Linux native Wayland behavior and documentation`
+    - [x] `is_wayland()` detection via `WAYLAND_DISPLAY` and `XDG_SESSION_TYPE`
+    - [x] Graceful degradation to idle on pure Wayland sessions without crashing
+    - [x] Support boundary clarification (X11 & XWayland supported; pure Wayland fallback to idle)
+  - [x] **#14** — `[Linux] Linux release baseline`
+    - [x] Final verification gate certifying stable source-based Linux release across 71 offline tests and 10 live runtime checks
 
 ---
 
