@@ -195,21 +195,189 @@ def test_engine_get_current_presence_api(mock_gui_controller):
     assert engine.connect() is True
     engine.running = True
 
+    expected_keys = {
+        "proc_name",
+        "app_name",
+        "details",
+        "window_title",
+        "state",
+        "large_image",
+        "large_text",
+        "start",
+        "payload",
+        "active",
+    }
+
     # When idle/no proc
     engine.current_proc = None
     presence = engine.get_current_presence()
+    assert set(presence.keys()) == expected_keys
     assert presence["active"] is False
     assert presence["app_name"] == "Idle"
+    assert presence["details"] == "No active application"
+    assert presence["window_title"] == ""
+    assert presence["state"] == "Idle"
 
     # When active proc
     engine.update_once()
     presence = engine.get_current_presence()
+    assert set(presence.keys()) == expected_keys
     assert presence["active"] is True
     assert presence["proc_name"] == "Code.exe"
     assert presence["app_name"] == "Visual Studio Code"
     assert presence["large_image"] == "vscode"
+    assert presence["large_text"] == "Visual Studio Code"
+    assert presence["window_title"] == "test.py - VS Code"
+    assert presence["state"] == "test.py - VS Code"
     assert presence["start"] == engine.current_proc_start_time
     assert presence["payload"] is not None
+
+
+def test_presence_explicit_window_title_and_state_separation(mock_gui_controller):
+    controller, engine, state, cfg_file = mock_gui_controller
+    assert engine.connect() is True
+    engine.running = True
+
+    # 1. With show_window_title = True (default)
+    state[0] = "Code.exe"
+    state[1] = "document.txt - Editor"
+    engine.update_once()
+
+    presence = engine.get_current_presence()
+    assert presence["window_title"] == "document.txt - Editor"
+    assert presence["state"] == "document.txt - Editor"
+    assert presence["payload"]["state"] == "document.txt - Editor"
+
+    st = controller.get_state()
+    assert st["window_title"] == "document.txt - Editor"
+    assert st["state"] == "document.txt - Editor"
+    assert st["state_text"] == "document.txt - Editor"
+
+    # 2. With show_window_title = False -> state is None, but window_title is preserved
+    controller.save_settings(show_window_title=False)
+    engine.last_state = None  # Reset last state to force presence rebuild
+    engine.update_once()
+
+    presence = engine.get_current_presence()
+    assert presence["window_title"] == "document.txt - Editor"
+    assert presence["state"] is None
+    assert presence["payload"]["state"] is None
+
+    st = controller.get_state()
+    assert st["window_title"] == "document.txt - Editor"
+    assert st["state"] is None
+    assert st["state_text"] == ""
+
+
+def test_presence_mapping_with_icon(mock_gui_controller):
+    controller, engine, state, cfg_file = mock_gui_controller
+    assert engine.connect() is True
+    engine.running = True
+
+    state[0] = "Code.exe"
+    state[1] = "main.py"
+    engine.update_once()
+
+    presence = engine.get_current_presence()
+    assert presence["app_name"] == "Visual Studio Code"
+    assert presence["large_image"] == "vscode"
+    assert presence["large_text"] == "Visual Studio Code"
+    assert presence["payload"]["large_image"] == "vscode"
+    assert presence["payload"]["large_text"] == "Visual Studio Code"
+
+    st = controller.get_state()
+    assert st["app_name"] == "Visual Studio Code"
+    assert st["icon_key"] == "vscode"
+
+
+def test_presence_mapping_without_icon(mock_gui_controller):
+    controller, engine, state, cfg_file = mock_gui_controller
+    assert engine.connect() is True
+    engine.running = True
+
+    # Register custom mapping with display name & detail, but NO icon
+    controller.save_mapping(
+        proc_name="cli_tool",
+        display_name="My Custom CLI",
+        icon_key="",
+        detail_text="Compiling binaries",
+    )
+
+    state[0] = "cli_tool"
+    state[1] = "Terminal Window"
+    engine.update_once()
+
+    presence = engine.get_current_presence()
+    assert presence["proc_name"] == "cli_tool"
+    assert presence["app_name"] == "My Custom CLI"
+    assert presence["details"] == "Compiling binaries"
+    assert presence["large_image"] is None
+    assert presence["large_text"] is None
+    assert "large_image" not in presence["payload"]
+    assert "large_text" not in presence["payload"]
+
+    # Verify controller state uses mapped display name even without large_text in payload
+    st = controller.get_state()
+    assert st["app_name"] == "My Custom CLI"
+    assert st["detail"] == "Compiling binaries"
+    assert st["icon_key"] is None
+
+
+def test_presence_idle_and_rpc_disabled_states(mock_gui_controller):
+    controller, engine, state, cfg_file = mock_gui_controller
+    expected_keys = {
+        "proc_name",
+        "app_name",
+        "details",
+        "window_title",
+        "state",
+        "large_image",
+        "large_text",
+        "start",
+        "payload",
+        "active",
+    }
+
+    # Case A: RPC Disabled (running = False)
+    engine.running = False
+    p_disabled = engine.get_current_presence()
+    assert set(p_disabled.keys()) == expected_keys
+    assert p_disabled["active"] is False
+    assert p_disabled["proc_name"] is None
+    assert p_disabled["app_name"] == "Idle"
+    assert p_disabled["details"] == "No active application"
+    assert p_disabled["window_title"] == ""
+    assert p_disabled["state"] == "RPC Disabled"
+    assert p_disabled["large_image"] is None
+    assert p_disabled["large_text"] is None
+    assert p_disabled["start"] is None
+    assert p_disabled["payload"] is None
+
+    st_disabled = controller.get_state()
+    assert st_disabled["running"] is False
+    assert st_disabled["app_name"] == "Idle"
+    assert st_disabled["state_text"] == "RPC Disabled"
+
+    # Case B: Idle while running (running = True, current_proc = None)
+    engine.running = True
+    engine.current_proc = None
+    p_idle = engine.get_current_presence()
+    assert set(p_idle.keys()) == expected_keys
+    assert p_idle["active"] is False
+    assert p_idle["proc_name"] is None
+    assert p_idle["app_name"] == "Idle"
+    assert p_idle["details"] == "No active application"
+    assert p_idle["window_title"] == ""
+    assert p_idle["state"] == "Idle"
+    assert p_idle["large_image"] is None
+    assert p_idle["large_text"] is None
+    assert p_idle["start"] is None
+    assert p_idle["payload"] is None
+
+    st_idle = controller.get_state()
+    assert st_idle["running"] is True
+    assert st_idle["app_name"] == "Idle"
+    assert st_idle["state_text"] == "Idle"
 
 
 def test_controller_timer_derivation_and_app_switch(mock_gui_controller):

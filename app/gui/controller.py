@@ -62,23 +62,13 @@ class GUIController:
         connected = bool(engine.connected)
         locked = bool(engine.locked)
 
-        # Consume current presence from engine public API
-        if hasattr(engine, "get_current_presence"):
-            cur_presence = engine.get_current_presence()
-        else:
-            cur_presence = {
-                "active": False,
-                "proc_name": None,
-                "app_name": "Idle",
-                "details": "No active application",
-                "state": "Idle" if running else "RPC Disabled",
-                "large_image": None,
-                "start": None,
-                "payload": None,
-            }
+        # Consume current presence directly from engine public API
+        cur_presence = engine.get_current_presence()
 
         proc_name = cur_presence.get("proc_name")
         start_ts = cur_presence.get("start")
+        window_title = cur_presence.get("window_title", "")
+        state_val = cur_presence.get("state")
 
         elapsed_seconds = 0
         if start_ts and running and proc_name:
@@ -92,8 +82,9 @@ class GUIController:
             "proc_name": proc_name,
             "app_name": cur_presence.get("app_name", "Idle"),
             "detail": cur_presence.get("details", "No active application"),
-            "state_text": cur_presence.get("state", ""),
-            "window_title": cur_presence.get("state", ""),
+            "state_text": state_val or "",
+            "state": state_val,
+            "window_title": window_title,
             "icon_key": cur_presence.get("large_image"),
             "elapsed_seconds": elapsed_seconds,
             "start_ts": start_ts,
@@ -212,11 +203,15 @@ class GUIController:
         if "custom_mappings" not in raw or not isinstance(raw["custom_mappings"], dict):
             raw["custom_mappings"] = {}
 
-        raw["custom_mappings"][clean_proc] = {
+        mapping_entry = {
             "name": str(display_name).strip() or clean_proc,
-            "icon": str(icon_key).strip() or "discord",
             "detail": str(detail_text).strip() or f"Using {display_name}",
         }
+        clean_icon = str(icon_key).strip() if icon_key else ""
+        if clean_icon:
+            mapping_entry["icon"] = clean_icon
+
+        raw["custom_mappings"][clean_proc] = mapping_entry
 
         save_config(raw, self.config_path)
         self.engine.reload_config()

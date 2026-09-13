@@ -106,8 +106,8 @@ class PresenceEngine:
             self.current_proc = None
             logger.info("Presence unlocked.")
 
-    def _build_presence(self, proc_name, window_title, start_ts):
-        """Constructs and sanitizes the Discord presence payload."""
+    def _resolve_mapping(self, proc_name):
+        """Resolves process name to display name, detail text, and optional icon key."""
         mappings = self.config.get("custom_mappings", {})
         clean_proc = proc_name[:-4] if proc_name.lower().endswith(".exe") else proc_name
 
@@ -135,13 +135,19 @@ class PresenceEngine:
                 mapping = mappings.get("gimp")
 
         if mapping and isinstance(mapping, dict):
-            app_name = mapping.get("name", clean_proc)
-            detail = mapping.get("detail", f"Using {app_name}")
+            app_name = mapping.get("name") or clean_proc
+            detail = mapping.get("detail") or f"Using {app_name}"
             icon_key = mapping.get("icon")
         else:
             app_name = clean_proc
             detail = f"Using {clean_proc}"
             icon_key = None
+
+        return app_name, detail, icon_key
+
+    def _build_presence(self, proc_name, window_title, start_ts):
+        """Constructs and sanitizes the Discord presence payload."""
+        app_name, detail, icon_key = self._resolve_mapping(proc_name)
 
         state = None
         if self.config.get("show_window_title") and window_title:
@@ -284,6 +290,7 @@ class PresenceEngine:
                 "proc_name": None,
                 "app_name": "Idle",
                 "details": "No active application",
+                "window_title": "",
                 "state": "Idle" if self.running else "RPC Disabled",
                 "large_image": None,
                 "large_text": None,
@@ -291,13 +298,15 @@ class PresenceEngine:
                 "payload": None,
             }
 
+        app_name, detail, icon_key = self._resolve_mapping(proc_name)
         payload = self._build_presence(proc_name, window_title, start_ts or int(time.time()))
         return {
             "active": True,
             "proc_name": proc_name,
-            "app_name": payload.get("large_text", proc_name),
-            "details": payload.get("details", f"Using {proc_name}"),
-            "state": payload.get("state") or window_title or "",
+            "app_name": app_name,
+            "details": payload.get("details", truncate_utf8(detail, 128)),
+            "window_title": window_title,
+            "state": payload.get("state"),
             "large_image": payload.get("large_image"),
             "large_text": payload.get("large_text"),
             "start": start_ts,
