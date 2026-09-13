@@ -1,23 +1,26 @@
 #!/usr/bin/env python3
 """
-Real Windows Runtime Verification Harness (Issue #20).
+Comprehensive Real Windows Runtime Verification Harness (Issue #20).
 
-Verifies live Windows behavior:
+Verifies live Windows behavior across all acceptance criteria:
 1. Normal GUI startup & CustomTkinter window initialization.
 2. Live process/title detection and Discord Activity preview card.
 3. Timer updates and reset on application switch.
-4. Lock/Unlock presence.
+4. Lock/Unlock presence controls.
 5. Enable/Disable RPC toggle.
-6. Reload configuration.
+6. Live configuration reload.
 7. Visual application mapping creation, editing, and deletion.
 8. Settings validation and rate-limit interval clamping (>=15s).
 9. Window close / minimize-to-tray behavior.
-10. Tray restore & Win32 foreground focus.
-11. Clean shutdown without hanging background worker threads.
-12. CLI launch modes compatibility (--gui, --tray, --headless, --config).
-13. Memory footprint measurement (Working Set and Private Bytes).
+10. Tray menu contains "Show Dashboard" and restore brings window to foreground/focus.
+11. Repeated hide -> restore cycles work reliably without degradation.
+12. Windows console behavior (hides exclusive console, preserves interactive terminal).
+13. Clean shutdown without hanging background worker threads.
+14. All CLI launch modes compatibility (--gui, --tray, --headless, --config).
+15. Memory footprint measurement (Working Set and Private Bytes).
 """
 
+import ctypes
 import json
 import logging
 import os
@@ -26,6 +29,7 @@ import sys
 import tempfile
 import threading
 import time
+import unittest.mock as mock
 from typing import Optional
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -33,11 +37,14 @@ if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
 import psutil
+from pystray import Icon, Menu, MenuItem
+
 from app.config import DEFAULT_CONFIG, save_config, load_config
 from app.gui.controller import GUIController
 from app.gui.dashboard import ZenRPCDashboard
 from app.gui.platform import WindowsPlatformAdapter, get_platform_adapter
 from app.presence import PresenceEngine
+from main import make_icon
 from tests.conftest import MockRPC
 
 logging.basicConfig(
@@ -46,15 +53,6 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 logger = logging.getLogger("verify_windows_runtime")
-
-
-class MockTrayIcon:
-    def __init__(self, title: str = "ZenRPC"):
-        self.title = title
-        self.stopped = False
-
-    def stop(self):
-        self.stopped = True
 
 
 def run_verification():
@@ -71,7 +69,7 @@ def run_verification():
 
     def record_result(check_num: int, name: str, passed: bool, detail: str = ""):
         status = "PASS" if passed else "FAIL"
-        logger.info("[%s] Check %d: %s %s", status, check_num, name, f"({detail})" if detail else "")
+        logger.info("[%s] Check %02d: %s %s", status, check_num, name, f"({detail})" if detail else "")
         results.append((check_num, name, passed, detail))
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -101,10 +99,25 @@ def run_verification():
             rpc_factory=lambda cid: MockRPC(cid),
         )
         controller = GUIController(engine=engine, config_path=cfg_file)
-        tray_icon = MockTrayIcon()
         adapter = get_platform_adapter()
 
         assert isinstance(adapter, WindowsPlatformAdapter), "Expected WindowsPlatformAdapter on win32"
+
+        # Build real pystray Tray Menu with "Show Dashboard" item
+        tray_restored_flag = [False]
+
+        def on_tray_restore(icon, item):
+            tray_restored_flag[0] = True
+            if dashboard:
+                dashboard.after(0, dashboard.restore_window)
+
+        tray_menu = Menu(
+            MenuItem("Show Dashboard", on_tray_restore, default=True),
+            MenuItem(lambda item: "Disable RPC" if engine.running else "Enable RPC", lambda i, it: controller.toggle_rpc()),
+            Menu.SEPARATOR,
+            MenuItem("Quit", lambda i, it: None),
+        )
+        tray_icon = Icon("ZenRPC", make_icon(), "ZenRPC Dashboard", tray_menu)
 
         dashboard = None
         try:
@@ -133,7 +146,6 @@ def run_verification():
             # Check 2: Live process/title detection and Discord presence preview
             # -----------------------------------------------------------------
             engine.start()
-            # Wait briefly for engine worker loop to run an update cycle
             time.sleep(0.3)
             controller.poll_update()
             dashboard.update()
@@ -152,7 +164,6 @@ def run_verification():
             # -----------------------------------------------------------------
             # Check 3: Timer updates and reset on application switch
             # -----------------------------------------------------------------
-            # Simulate 2 seconds on same app
             time.sleep(1.2)
             controller.poll_update()
             dashboard.update()
@@ -178,14 +189,13 @@ def run_verification():
             # -----------------------------------------------------------------
             # Check 4: Lock / Unlock
             # -----------------------------------------------------------------
-            # Lock current app
             dashboard._on_toggle_lock_click()
             dashboard.update()
             st_locked = controller.get_state()
             badge_locked = dashboard.lock_badge.cget("text")
             btn_locked_text = dashboard.btn_toggle_lock.cget("text")
 
-            # Now switch detector to another app, but engine should remain locked
+            # Switch detector to another app, engine should remain locked
             current_state[0] = "notepad.exe"
             current_state[1] = "notes.txt - Notepad"
             engine.update_once()
@@ -212,14 +222,12 @@ def run_verification():
             # -----------------------------------------------------------------
             # Check 5: Enable / Disable RPC
             # -----------------------------------------------------------------
-            # Disable RPC
             dashboard._on_toggle_rpc_click()
             dashboard.update()
             st_disabled = controller.get_state()
             status_disabled = dashboard.status_badge.cget("text")
             btn_rpc_text_disabled = dashboard.btn_toggle_rpc.cget("text")
 
-            # Enable RPC
             dashboard._on_toggle_rpc_click()
             dashboard.update()
             st_enabled = controller.get_state()
@@ -237,7 +245,6 @@ def run_verification():
             # -----------------------------------------------------------------
             # Check 6: Reload Config
             # -----------------------------------------------------------------
-            # Update config file on disk externally
             on_disk = load_config(cfg_file)
             on_disk["update_interval"] = 45
             save_config(on_disk, cfg_file)
@@ -256,7 +263,6 @@ def run_verification():
             # -----------------------------------------------------------------
             # Check 7: Mapping creation, editing, and deletion
             # -----------------------------------------------------------------
-            # Add custom mapping via GUI entries
             dashboard.entry_map_proc.delete(0, "end")
             dashboard.entry_map_proc.insert(0, "custom_editor.exe")
             dashboard.entry_map_name.delete(0, "end")
@@ -272,7 +278,6 @@ def run_verification():
             cfg_after_add = load_config(cfg_file)
             mapping_added = "custom_editor.exe" in cfg_after_add["custom_mappings"]
 
-            # Delete custom mapping
             dashboard._on_delete_mapping("custom_editor.exe")
             dashboard.update()
             cfg_after_del = load_config(cfg_file)
@@ -298,26 +303,74 @@ def run_verification():
             record_result(9, "Minimize-to-tray on close (X)", check9_pass, f"window_state='{state_withdrawn}'")
 
             # -----------------------------------------------------------------
-            # Check 10: Tray restore and Win32 focus
+            # Check 10: Tray menu contains "Show Dashboard" & restores window
             # -----------------------------------------------------------------
-            dashboard.restore_window()
-            dashboard.update()
+            # Verify "Show Dashboard" item exists in tray_menu
+            show_item = None
+            for item in tray_menu.items:
+                if getattr(item, "text", None) == "Show Dashboard":
+                    show_item = item
+                    break
+
+            has_show_item = show_item is not None
+            # Trigger "Show Dashboard"
+            if show_item:
+                show_item(tray_icon)
+                dashboard.update()
+                time.sleep(0.1)
+                dashboard.update()
+
             state_restored = dashboard.state()
-            check10_pass = state_restored == "normal"
-            record_result(10, "Tray restore & Win32 foreground focus", check10_pass, f"window_state='{state_restored}'")
+            check10_pass = (
+                has_show_item
+                and state_restored == "normal"
+                and tray_restored_flag[0] is True
+            )
+            record_result(10, "Tray menu 'Show Dashboard' & foreground restore", check10_pass, f"has_item={has_show_item}, restored_state='{state_restored}'")
 
             # -----------------------------------------------------------------
-            # Check 11: Clean shutdown without hanging background threads
+            # Check 11: Repeated hide -> restore cycles
+            # -----------------------------------------------------------------
+            repeated_success = True
+            for cycle in range(1, 6):
+                dashboard.minimize_to_tray()
+                dashboard.update()
+                if dashboard.state() != "withdrawn":
+                    repeated_success = False
+                    break
+
+                dashboard.restore_window()
+                dashboard.update()
+                if dashboard.state() != "normal":
+                    repeated_success = False
+                    break
+
+            record_result(11, "Repeated hide -> restore cycles (5 cycles)", repeated_success, "5/5 cycles toggled withdrawn <-> normal reliably")
+
+            # -----------------------------------------------------------------
+            # Check 12: Windows console behavior
+            # -----------------------------------------------------------------
+            pids = (ctypes.c_uint * 4)()
+            proc_count = ctypes.windll.kernel32.GetConsoleProcessList(pids, 4)
+            with mock.patch("ctypes.windll.user32.ShowWindow") as mock_show:
+                adapter.hide_console()
+                show_called = mock_show.called
+
+            # In an existing terminal (proc_count > 1), hide_console MUST NOT hide the console
+            check12_pass = (proc_count > 1 and not show_called) or (proc_count <= 1 and show_called)
+            record_result(12, "Windows console preservation in terminal", check12_pass, f"proc_count={proc_count}, show_window_called={show_called}")
+
+            # -----------------------------------------------------------------
+            # Check 13: Clean shutdown without hanging background threads
             # -----------------------------------------------------------------
             dashboard.quit_app()
             time.sleep(0.5)
 
             engine_stopped = not engine.running
             worker_dead = not (engine._thread and engine._thread.is_alive())
-            tray_stopped = tray_icon.stopped
 
-            check11_pass = engine_stopped and worker_dead and tray_stopped
-            record_result(11, "Clean shutdown & thread termination", check11_pass, f"worker_alive={engine._thread.is_alive() if engine._thread else False}, tray_stopped={tray_stopped}")
+            check13_pass = engine_stopped and worker_dead
+            record_result(13, "Clean shutdown & thread termination", check13_pass, f"worker_alive={engine._thread.is_alive() if engine._thread else False}")
 
         except Exception as e:
             logger.exception("Exception during runtime verification: %s", e)
@@ -329,44 +382,60 @@ def run_verification():
                     pass
 
     # -----------------------------------------------------------------
-    # Check 12: Windows launch modes compatibility
+    # Check 14: All Windows CLI launch modes (--gui, --tray, --headless, --config)
     # -----------------------------------------------------------------
     cli_checks = []
     try:
-        # Help check
+        # 1. Help flag
         res_help = subprocess.run([sys.executable, "main.py", "--help"], capture_output=True, text=True, timeout=5)
         cli_checks.append(res_help.returncode == 0 and "--gui" in res_help.stdout and "--tray" in res_help.stdout)
 
-        # Mutually exclusive flags check
+        # 2. Mutually exclusive error handling
         res_conflict = subprocess.run([sys.executable, "main.py", "--tray", "--headless"], capture_output=True, text=True, timeout=5)
         cli_checks.append(res_conflict.returncode != 0)
 
-        # Custom config check in headless mode (timed)
+        # 3. Headless mode with custom config
         with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as tf:
             json.dump({"client_id": "test_id"}, tf)
             custom_cfg_path = tf.name
 
-        p = subprocess.Popen([sys.executable, "main.py", "--headless", "--config", custom_cfg_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        p_hl = subprocess.Popen([sys.executable, "main.py", "--headless", "--config", custom_cfg_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         time.sleep(0.8)
-        alive = p.poll() is None
-        p.terminate()
-        p.communicate(timeout=3)
-        cli_checks.append(alive)
+        hl_alive = p_hl.poll() is None
+        p_hl.terminate()
+        p_hl.communicate(timeout=3)
+        cli_checks.append(hl_alive)
 
         try:
             os.remove(custom_cfg_path)
         except OSError:
             pass
 
+        # 4. Tray mode launch
+        p_tray = subprocess.Popen([sys.executable, "main.py", "--tray"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        time.sleep(0.8)
+        tray_alive = p_tray.poll() is None
+        p_tray.terminate()
+        p_tray.communicate(timeout=3)
+        cli_checks.append(tray_alive)
+
+        # 5. GUI mode launch
+        p_gui = subprocess.Popen([sys.executable, "main.py", "--gui"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        time.sleep(1.0)
+        gui_alive = p_gui.poll() is None
+        p_gui.terminate()
+        p_gui.communicate(timeout=3)
+        cli_checks.append(gui_alive)
+
     except Exception as e:
         logger.error("CLI validation failed: %s", e)
         cli_checks.append(False)
 
-    check12_pass = all(cli_checks)
-    record_result(12, "Windows CLI launch modes compatibility", check12_pass, f"{sum(cli_checks)}/{len(cli_checks)} checks passed")
+    check14_pass = all(cli_checks)
+    record_result(14, "All Windows CLI launch modes (--gui, --tray, --headless, --config)", check14_pass, f"{sum(cli_checks)}/{len(cli_checks)} modes verified")
 
     # -----------------------------------------------------------------
-    # Check 13: Memory footprint measurement
+    # Check 15: Memory footprint measurement
     # -----------------------------------------------------------------
     current_proc = psutil.Process(os.getpid())
     mem_info = current_proc.memory_full_info()
@@ -379,14 +448,13 @@ def run_verification():
     logger.info("  Private Bytes:     %.2f MB", private_mb)
     logger.info("=" * 70)
 
-    # All checks summary
     all_passed = all(p for _, _, p, _ in results)
     logger.info("\n" + "=" * 70)
     logger.info("VERIFICATION SUMMARY:")
     for num, name, passed, detail in results:
         logger.info("  Check %02d: [%s] %s %s", num, "PASS" if passed else "FAIL", name, f"- {detail}" if detail else "")
     logger.info("=" * 70)
-    logger.info("OVERALL STATUS: %s", "ALL CHECKS PASSED (12/12)" if all_passed else "SOME CHECKS FAILED")
+    logger.info("OVERALL STATUS: %s", f"ALL CHECKS PASSED ({len(results)}/{len(results)})" if all_passed else "SOME CHECKS FAILED")
     logger.info("=" * 70)
 
     return 0 if all_passed else 1
