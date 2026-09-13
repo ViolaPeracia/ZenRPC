@@ -36,6 +36,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
+import customtkinter as ctk
 import psutil
 from pystray import Icon, Menu, MenuItem
 
@@ -134,13 +135,17 @@ def run_verification():
             dashboard.update()
 
             hwnd = adapter.get_window_hwnd(dashboard)
+            win_scale = ctk.ScalingTracker.get_window_scaling(dashboard)
+            widget_scale = ctk.ScalingTracker.get_widget_scaling(dashboard)
             check1_pass = (
                 dashboard.winfo_exists()
                 and dashboard.title() == "ZenRPC Dashboard"
                 and hwnd is not None
                 and hwnd > 0
+                and win_scale > 0
+                and widget_scale > 0
             )
-            record_result(1, "Normal GUI startup & Win32 HWND resolution", check1_pass, f"HWND={hwnd}")
+            record_result(1, "Normal GUI startup, Win32 HWND resolution & DPI scaling", check1_pass, f"HWND={hwnd}, DPI={win_scale*100:.0f}%")
 
             # -----------------------------------------------------------------
             # Check 2: Live process/title detection and Discord presence preview
