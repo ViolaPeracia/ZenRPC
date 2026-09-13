@@ -166,7 +166,7 @@ Local unit testing via `pytest` (71 offline tests passing without requiring Disc
 ### Mini-Milestones & Enhancements
 
 #### Milestone: M-GUI — Lightweight Desktop GUI Dashboard
-- [ ] **#20** — `[GUI] Lightweight desktop GUI dashboard for status monitoring and configuration` *(Linux phase complete; Windows phase complete; release validation in progress)*
+- [x] **#20** — `[GUI] Lightweight desktop GUI dashboard for status monitoring and configuration`
   - [x] (Linux) Decoupled GUIController view-model with observer pattern (`app/gui/controller.py`)
   - [x] (Linux) CustomTkinter desktop dashboard with real-time Discord presence profile card preview (`app/gui/dashboard.py`)
   - [x] (Linux) Connection status badge (Connected / Reconnecting / RPC Disabled) and lock status indicator
@@ -179,9 +179,9 @@ Local unit testing via `pytest` (71 offline tests passing without requiring Disc
   - [x] (Windows) Windows platform adapter (`app/gui/platform.py`) isolating OS-specific window management, Win32 HWND resolution, and console suppression
   - [x] (Windows) Tray minimize/restore lifecycle with Win32 foreground lock bypass (`AttachThreadInput` and `BringWindowToTop`)
   - [x] (Windows) Unit tests (`tests/test_gui_platform.py`) verifying adapter selection, Win32 focus handling, and console hiding
-  - [x] (Windows) Real runtime verification harness (`tests/verify_windows_runtime.py`) passing all 12 checks
-  - [x] (Windows) Measured memory footprint on Windows: ~45.7 MB Private Bytes, ~65.1 MB Working Set (RSS)
-  - [ ] (Validation) Final release validation and multi-machine acceptance gating
+  - [x] (Windows) Real runtime verification harness (`tests/verify_windows_runtime.py`) passing all 14 checks
+  - [x] (Windows) Measured memory footprint on Windows: ~45.9 MB Private Bytes, ~65.7 MB Working Set (RSS)
+  - [x] (Validation) Final release validation and multi-machine acceptance gating completed
 
 #### Assets & Application Recognition
 - [x] **#19** — `[Assets & Catalog] Missing application logos in Rich Presence and expanding recognized applications catalog`
