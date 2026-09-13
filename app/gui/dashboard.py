@@ -14,6 +14,7 @@ import customtkinter as ctk
 from PIL import Image
 
 from app.gui.controller import GUIController, format_elapsed_time
+from app.gui.platform import BasePlatformAdapter, get_platform_adapter
 
 logger = logging.getLogger("zenrpc.gui")
 
@@ -30,11 +31,13 @@ class ZenRPCDashboard(ctk.CTk):
         controller: Optional[GUIController] = None,
         tray_icon=None,
         assets_dir: Optional[str] = None,
+        platform_adapter: Optional[BasePlatformAdapter] = None,
     ):
         super().__init__()
 
         self.controller = controller or GUIController()
         self.tray_icon = tray_icon
+        self.platform_adapter = platform_adapter or get_platform_adapter()
         self.assets_dir = assets_dir or os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
             "assets",
@@ -211,7 +214,7 @@ class ZenRPCDashboard(ctk.CTk):
             self.btn_min_tray = ctk.CTkButton(
                 self.controls_frame,
                 text="Minimize to Tray",
-                command=self.withdraw,
+                command=self.minimize_to_tray,
                 width=140,
                 height=36,
                 fg_color="#36393f",
@@ -703,6 +706,13 @@ class ZenRPCDashboard(ctk.CTk):
 
         self._update_icon_image(icon_key)
 
+        if self.tray_icon:
+            self.platform_adapter.update_tray_state(
+                self.tray_icon,
+                locked=locked,
+                running=running,
+            )
+
     def _periodic_tick(self):
         """Called every second by Tkinter event loop."""
         try:
@@ -712,23 +722,25 @@ class ZenRPCDashboard(ctk.CTk):
         finally:
             self._tick_timer = self.after(1000, self._periodic_tick)
 
+    def minimize_to_tray(self):
+        """Minimizes dashboard window to system tray using platform adapter."""
+        logger.info("Minimizing ZenRPC Dashboard to system tray.")
+        self.platform_adapter.minimize_to_tray(self)
+
     def on_closing(self):
         """Handles window [X] close button click."""
         cfg = self.controller.get_config()
         min_to_tray = cfg.get("minimize_to_tray", True)
 
-        # If minimize_to_tray enabled AND tray is available, withdraw window
+        # If minimize_to_tray enabled AND tray is available, withdraw window to tray
         if min_to_tray and self.tray_icon is not None:
-            logger.info("Minimizing ZenRPC Dashboard to system tray.")
-            self.withdraw()
+            self.minimize_to_tray()
         else:
             self.quit_app()
 
     def restore_window(self):
-        """Restores dashboard window from tray minimization."""
-        self.deiconify()
-        self.lift()
-        self.focus_force()
+        """Restores dashboard window from tray minimization using platform adapter."""
+        self.platform_adapter.restore_and_focus(self)
 
     def quit_app(self):
         """Gracefully shuts down engine and closes dashboard."""

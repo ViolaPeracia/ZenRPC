@@ -124,6 +124,9 @@ def test_external_cwd_subprocess_resolution(tmp_path):
 
 def test_run_sh_script_cwd_independence(tmp_path):
     """run.sh launcher resolves repository root correctly from an external working directory."""
+    if sys.platform == "win32":
+        pytest.skip("run.sh is a POSIX shell script launcher for Linux environments")
+
     repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     run_sh = os.path.join(repo_root, "run.sh")
     assert os.path.isfile(run_sh)

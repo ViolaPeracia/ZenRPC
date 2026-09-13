@@ -91,7 +91,7 @@ To display rich presence on Discord, you need a free Discord Application ID:
  
  ---
 
-## 🖥️ Desktop GUI Dashboard (Linux)
+## 🖥️ Desktop GUI Dashboard (Windows & Linux)
 
 ZenRPC features a modern, ultra-lightweight desktop dashboard built with **CustomTkinter** that provides a complete visual control center without the overhead of Electron or Qt:
 
@@ -120,10 +120,10 @@ ZenRPC features a modern, ultra-lightweight desktop dashboard built with **Custo
 - **Application Mapping Manager:** Easily view built-in (read-only) and custom rules, search processes in real-time, add overrides, edit existing mappings, and remove custom definitions without corrupting default rules. Paginated for high performance.
 - **Visual Settings:** Configure your Discord Client ID, adjust presence update interval (with automatic $\ge$ 15s Discord rate-limit clamping), tune reconnect retry delays, and toggle idle/title broadcasting.
 - **Measured Memory Footprint:**
-  - **Private Anonymous Memory (`RssAnon`):** **~32–37 MB** (actual heap and Python objects allocated specifically by the GUI).
-  - **Total Process Memory (`VmRSS`):** **~55–62 MB** (comprising ~32–37 MB private anonymous heap + ~23–25 MB shared system libraries dynamically mapped by the Linux kernel, including `libc.so`, `libX11.so`, `libtk8.6.so`, and the Python runtime).
-  - *Technical note:* ZenRPC does not label the GUI total footprint as "<50 MB" because total process `VmRSS` measures ~55–62 MB at runtime, while the application's own private heap footprint is ~32–37 MB. Both figures represent a fraction of the resource requirements of Electron (250–500 MB) or PyQt6 (90–120 MB).
-- **Window Lifecycle & Tray Integration:** Minimizes seamlessly to the system tray upon clicking the close button (`[X]`). Capability-based fallback gracefully handles desktop environments without tray watchers (such as default GNOME Shell or minimal Wayland sessions).
+  - **Windows:** **~45.7 MB Private Bytes**, **~65.1 MB Working Set (RSS)**.
+  - **Linux:** **~32–37 MB Private Anonymous RAM (`RssAnon`)**, **~55–62 MB Total Process Memory (`VmRSS`)** (including dynamically mapped shared system libraries).
+  - *Technical note:* On both platforms, ZenRPC's private memory allocations stay well within lightweight boundaries (< 50 MB private heap/bytes), representing a fraction of the resource requirements of Electron (250–500 MB) or PyQt6 (90–120 MB).
+- **Window Lifecycle & Tray Integration:** Minimizes seamlessly to the system tray upon clicking the close button (`[X]`). Restores and reliably brings the window to the foreground using native platform adapters (Win32 foreground lock bypass on Windows; capability-based fallback on Linux).
 
 ### Launch Modes & CLI Flags
 
@@ -131,21 +131,21 @@ ZenRPC supports three distinct operating modes:
 
 ```bash
 # 1. Desktop GUI Dashboard (Default)
-./run.sh
-# or: python3 main.py
+# Windows: run.bat or python main.py
+# Linux:   ./run.sh or python3 main.py
 
-# 2. Legacy System Tray Only Mode (Runs in tray without opening GUI)
-python3 main.py --tray
+# 2. System Tray Only Mode (Runs in tray without opening GUI)
+python main.py --tray
 
 # 3. Headless Console Mode (Pure background daemon for servers/minimal setups)
-python3 main.py --headless
+python main.py --headless
 
 # Optional: Specify a custom configuration file
-python3 main.py --config /path/to/custom_config.json
+python main.py --config /path/to/custom_config.json
 ```
 
 > [!NOTE]
-> **Linux Dependencies for GUI:** The GUI uses CustomTkinter, which relies on standard Python Tk bindings. Ensure `tk` / `python3-tk` is installed on your Linux distribution (`sudo apt install python3-tk` on Debian/Ubuntu or `sudo pacman -S tk` on Arch/CachyOS).
+> **GUI Dependencies:** The GUI uses CustomTkinter, which relies on standard Python Tk bindings. On Windows, Tkinter is included with standard Python installers. On Linux, ensure `tk` / `python3-tk` is installed on your distribution (`sudo apt install python3-tk` on Debian/Ubuntu or `sudo pacman -S tk` on Arch/CachyOS).
 
 ---
 

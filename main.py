@@ -77,28 +77,17 @@ def make_icon(locked=False):
     return img
 
 
+from app.gui.platform import get_platform_adapter
+
+
 def open_file_externally(path):
-    """Opens a file using the operating system's default handler."""
-    try:
-        if sys.platform == "win32":
-            os.startfile(path)
-        elif sys.platform.startswith("linux"):
-            subprocess.Popen(["xdg-open", path])
-        elif sys.platform == "darwin":
-            subprocess.Popen(["open", path])
-    except Exception as e:
-        logger.warning("Could not open file %s: %s", path, e)
+    """Opens a file using the operating system's default handler via platform adapter."""
+    get_platform_adapter().open_file_externally(path)
 
 
 def hide_windows_console():
-    """Hides console window on Windows when not in persistent terminal."""
-    if sys.platform == "win32":
-        try:
-            hwnd = ctypes.windll.kernel32.GetConsoleWindow()
-            if hwnd:
-                ctypes.windll.user32.ShowWindow(hwnd, 0)
-        except Exception:
-            pass
+    """Hides console window on Windows when not in persistent terminal via platform adapter."""
+    get_platform_adapter().hide_console()
 
 
 def parse_args(args=None):
