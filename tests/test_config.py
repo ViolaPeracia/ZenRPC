@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import signal
 import subprocess
 import sys
@@ -166,6 +167,48 @@ def test_run_sh_execution_from_external_cwd(tmp_path):
         proc.kill()
         raise
 
+
+def test_desktop_entry_syntax_and_exec():
+    """zenrpc.desktop must exist and conform to desktop entry syntax with a valid Exec key."""
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    desktop_file = os.path.join(repo_root, "zenrpc.desktop")
+    assert os.path.isfile(desktop_file), "zenrpc.desktop does not exist"
+
+    # Validate basic key/value structure
+    with open(desktop_file, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    assert "[Desktop Entry]" in content
+    assert "Type=Application" in content
+    assert "Name=ZenRPC" in content
+    assert "Exec=" in content
+
+    # Find Exec line
+    exec_line = None
+    for line in content.splitlines():
+        if line.startswith("Exec="):
+            exec_line = line.split("=", 1)[1].strip()
+            break
+    assert exec_line is not None
+    assert "run.sh" in exec_line
+    # Ensure invalid KeyFile escape sequences like '\"' are not present
+    assert '\\"' not in exec_line
+
+    # If desktop-file-validate is available, assert validation passes
+    validator = shutil.which("desktop-file-validate")
+    if validator:
+        res = subprocess.run([validator, desktop_file], capture_output=True, text=True)
+        assert res.returncode == 0, f"desktop-file-validate failed: {res.stdout} {res.stderr}"
+
+    # If GLib is available, verify GLib.KeyFile parses Exec cleanly
+    try:
+        from gi.repository import GLib
+        kf = GLib.KeyFile()
+        kf.load_from_file(desktop_file, GLib.KeyFileFlags.NONE)
+        glib_exec = kf.get_string("Desktop Entry", "Exec")
+        assert "run.sh" in glib_exec
+    except (ImportError, ValueError):
+        pass
 
 
 def test_custom_mappings_merge_user_and_defaults():

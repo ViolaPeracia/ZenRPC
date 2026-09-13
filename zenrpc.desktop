@@ -2,7 +2,7 @@
 Type=Application
 Name=ZenRPC
 Comment=Discord Rich Presence for active window
-Exec=sh -c "\"\\$(dirname \"%k\")/run.sh\""
+Exec=sh -c "exec \\$(dirname \\$1)/run.sh" sh %k
 # Optional: Set absolute Path and Exec if copying to ~/.local/share/applications/
 # Path=/path/to/ZenRPC
 # Exec=/path/to/ZenRPC/run.sh
