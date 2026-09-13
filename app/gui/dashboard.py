@@ -276,16 +276,23 @@ class ZenRPCDashboard(ctk.CTk):
         self.entry_map_detail = ctk.CTkEntry(d_col, placeholder_text="Working on project")
         self.entry_map_detail.pack(fill="x", pady=2)
 
+        # Bottom action bar of form
+        form_bottom = ctk.CTkFrame(form_frame, fg_color="transparent")
+        form_bottom.pack(fill="x", padx=14, pady=(2, 10))
+
+        self.lbl_mapping_status = ctk.CTkLabel(form_bottom, text="", font=ctk.CTkFont(size=12))
+        self.lbl_mapping_status.pack(side="left")
+
         # Save Mapping button
         btn_save_map = ctk.CTkButton(
-            form_frame,
+            form_bottom,
             text="Save Custom Mapping",
             command=self._on_save_mapping_click,
             fg_color="#2ecc71",
             hover_color="#27ae60",
             width=160,
         )
-        btn_save_map.pack(anchor="e", padx=14, pady=(2, 10))
+        btn_save_map.pack(side="right")
 
         # Scrollable Mappings List
         self.mappings_scroll = ctk.CTkScrollableFrame(self.tab_mappings, width=720, height=260)
@@ -458,6 +465,10 @@ class ZenRPCDashboard(ctk.CTk):
         detail = self.entry_map_detail.get().strip()
 
         if not proc:
+            self.lbl_mapping_status.configure(
+                text="Please enter a process name (e.g. 'orca-ide' or 'code')",
+                text_color="#e74c3c",
+            )
             return
 
         try:
@@ -467,8 +478,11 @@ class ZenRPCDashboard(ctk.CTk):
             self.entry_map_icon.delete(0, "end")
             self.entry_map_detail.delete(0, "end")
             self._refresh_mappings_list()
+            self.lbl_mapping_status.configure(text=f"✓ Mapping '{proc}' saved successfully.", text_color="#2ecc71")
+            self.after(3000, lambda: self.lbl_mapping_status.configure(text=""))
         except Exception as e:
             logger.warning("Error saving mapping: %s", e)
+            self.lbl_mapping_status.configure(text=f"Error: {e}", text_color="#e74c3c")
 
     def _on_search_filter_changed(self, event=None):
         self._status_filter_text = self.search_entry.get().strip().lower()
@@ -590,8 +604,14 @@ class ZenRPCDashboard(ctk.CTk):
             ).pack(pady=20)
 
     def _on_delete_mapping(self, proc: str):
-        self.controller.delete_mapping(proc)
-        self._refresh_mappings_list()
+        try:
+            self.controller.delete_mapping(proc)
+            self._refresh_mappings_list()
+            self.lbl_mapping_status.configure(text=f"✓ Custom mapping '{proc}' removed.", text_color="#e67e22")
+            self.after(3000, lambda: self.lbl_mapping_status.configure(text=""))
+        except Exception as e:
+            logger.warning("Error deleting mapping: %s", e)
+            self.lbl_mapping_status.configure(text=f"Error deleting mapping: {e}", text_color="#e74c3c")
 
     def _set_default_icon(self):
         # Create a blank 80x80 dark placeholder

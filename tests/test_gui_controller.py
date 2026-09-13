@@ -188,3 +188,56 @@ def test_controller_listeners(mock_gui_controller):
     controller.remove_listener(on_update)
     controller.poll_update()
     assert len(received) == 1
+
+
+def test_engine_get_current_presence_api(mock_gui_controller):
+    controller, engine, state, cfg_file = mock_gui_controller
+    assert engine.connect() is True
+    engine.running = True
+
+    # When idle/no proc
+    engine.current_proc = None
+    presence = engine.get_current_presence()
+    assert presence["active"] is False
+    assert presence["app_name"] == "Idle"
+
+    # When active proc
+    engine.update_once()
+    presence = engine.get_current_presence()
+    assert presence["active"] is True
+    assert presence["proc_name"] == "Code.exe"
+    assert presence["app_name"] == "Visual Studio Code"
+    assert presence["large_image"] == "vscode"
+    assert presence["start"] == engine.current_proc_start_time
+    assert presence["payload"] is not None
+
+
+def test_controller_timer_derivation_and_app_switch(mock_gui_controller):
+    controller, engine, state, cfg_file = mock_gui_controller
+    assert engine.connect() is True
+    engine.running = True
+
+    state[0] = "Code.exe"
+    state[1] = "file1.py"
+    engine.update_once()
+
+    s1 = controller.get_state()
+    start_ts_initial = s1["start_ts"]
+    assert s1["proc_name"] == "Code.exe"
+    assert s1["start_ts"] == engine.current_proc_start_time
+
+    # Title-only change preserves start_ts
+    state[1] = "file2.py"
+    engine.update_once()
+    s2 = controller.get_state()
+    assert s2["start_ts"] == start_ts_initial
+
+    # App switch resets start_ts
+    state[0] = "firefox.exe"
+    state[1] = "Mozilla Firefox"
+    engine.update_once()
+    s3 = controller.get_state()
+    assert s3["proc_name"] == "firefox.exe"
+    assert s3["app_name"] == "Firefox"
+    assert s3["start_ts"] == engine.current_proc_start_time
+

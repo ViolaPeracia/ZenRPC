@@ -258,3 +258,49 @@ class PresenceEngine:
         if self._thread and self._thread.is_alive():
             self._thread.join(timeout=2)
         logger.info("ZenRPC engine stopped.")
+
+    def get_current_presence(self):
+        """
+        Returns a read-only snapshot dictionary of the current presence state and payload.
+        Allows external observers (such as the GUI dashboard) to consume active presence
+        information without duplicating detection, timing, or mapping resolution logic.
+        """
+        if self.locked and self.locked_proc:
+            proc_name = self.locked_proc
+            window_title = self.locked_title or ""
+            start_ts = self.locked_since
+        else:
+            proc_name = self.current_proc
+            last_st = self.last_state
+            if last_st and last_st[0] == proc_name:
+                window_title = last_st[1] or ""
+            else:
+                window_title = ""
+            start_ts = self.current_proc_start_time
+
+        if not proc_name or not self.running:
+            return {
+                "active": False,
+                "proc_name": None,
+                "app_name": "Idle",
+                "details": "No active application",
+                "state": "Idle" if self.running else "RPC Disabled",
+                "large_image": None,
+                "large_text": None,
+                "start": None,
+                "payload": None,
+            }
+
+        payload = self._build_presence(proc_name, window_title, start_ts or int(time.time()))
+        return {
+            "active": True,
+            "proc_name": proc_name,
+            "app_name": payload.get("large_text", proc_name),
+            "details": payload.get("details", f"Using {proc_name}"),
+            "state": payload.get("state") or window_title or "",
+            "large_image": payload.get("large_image"),
+            "large_text": payload.get("large_text"),
+            "start": start_ts,
+            "payload": payload,
+        }
+

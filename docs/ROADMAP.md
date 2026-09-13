@@ -175,7 +175,7 @@ Local unit testing via `pytest` (71 offline tests passing without requiring Disc
   - [x] (Linux) Visual settings configuration (Client ID, interval slider with $\ge$ 15s rate-limit clamp, reconnect delay, idle & title toggles)
   - [x] (Linux) Window minimize-to-tray lifecycle with capability-based fallback and restore
   - [x] (Linux) Multi-mode CLI (`main.py` default GUI, `--tray`, `--headless`, `--config`)
-  - [x] (Linux) Measured lightweight memory footprint (31.9 MB private anonymous RAM, ~55 MB VmRSS)
+  - [x] (Linux) Measured memory footprint: ~32–37 MB private anonymous RAM (RssAnon), ~55–62 MB total process resident memory (VmRSS) including shared dynamic libraries
   - [ ] (Windows) Windows runtime GUI verification and packaging
 
 #### Assets & Application Recognition

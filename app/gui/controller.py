@@ -54,6 +54,7 @@ class GUIController:
     def get_state(self) -> Dict:
         """
         Constructs a read-only snapshot of current engine and presence state.
+        Consumes public presence state from engine without duplicating presence construction logic.
         Never blocks the background loop.
         """
         engine = self.engine
@@ -61,41 +62,27 @@ class GUIController:
         connected = bool(engine.connected)
         locked = bool(engine.locked)
 
-        if locked and engine.locked_proc:
-            proc_name = engine.locked_proc
-            window_title = engine.locked_title or ""
-            start_ts = engine.locked_since
+        # Consume current presence from engine public API
+        if hasattr(engine, "get_current_presence"):
+            cur_presence = engine.get_current_presence()
         else:
-            proc_name = engine.current_proc
-            # When idle or no proc active
-            if proc_name:
-                # Active proc: title from last_state if matching
-                last_st = getattr(engine, "last_state", None)
-                if last_st and last_st[0] == proc_name:
-                    window_title = last_st[1] or ""
-                else:
-                    window_title = ""
-                start_ts = engine.current_proc_start_time
-            else:
-                window_title = ""
-                start_ts = None
+            cur_presence = {
+                "active": False,
+                "proc_name": None,
+                "app_name": "Idle",
+                "details": "No active application",
+                "state": "Idle" if running else "RPC Disabled",
+                "large_image": None,
+                "start": None,
+                "payload": None,
+            }
+
+        proc_name = cur_presence.get("proc_name")
+        start_ts = cur_presence.get("start")
 
         elapsed_seconds = 0
-        if start_ts and running:
+        if start_ts and running and proc_name:
             elapsed_seconds = max(0, int(time.time() - start_ts))
-
-        # Build presence preview information
-        if proc_name:
-            presence_payload = engine._build_presence(proc_name, window_title, start_ts or int(time.time()))
-            app_name = presence_payload.get("large_text", proc_name)
-            detail = presence_payload.get("details", f"Using {proc_name}")
-            state_text = presence_payload.get("state") or window_title or ""
-            icon_key = presence_payload.get("large_image")
-        else:
-            app_name = "Idle"
-            detail = "No active application"
-            state_text = "Idle" if running else "RPC Disabled"
-            icon_key = None
 
         return {
             "running": running,
@@ -103,13 +90,14 @@ class GUIController:
             "locked": locked,
             "locked_proc": engine.locked_proc,
             "proc_name": proc_name,
-            "app_name": app_name,
-            "detail": detail,
-            "state_text": state_text,
-            "window_title": window_title,
-            "icon_key": icon_key,
+            "app_name": cur_presence.get("app_name", "Idle"),
+            "detail": cur_presence.get("details", "No active application"),
+            "state_text": cur_presence.get("state", ""),
+            "window_title": cur_presence.get("state", ""),
+            "icon_key": cur_presence.get("large_image"),
             "elapsed_seconds": elapsed_seconds,
             "start_ts": start_ts,
+            "payload": cur_presence.get("payload"),
             "client_id": engine.config.get("client_id", ""),
             "update_interval": max(15, int(engine.config.get("update_interval", 15))),
             "reconnect_delay": int(engine.config.get("reconnect_delay", 30)),

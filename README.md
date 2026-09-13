@@ -109,12 +109,15 @@ ZenRPC features a modern, ultra-lightweight desktop dashboard built with **Custo
 ```
 
 ### Dashboard Highlights
-- **Live Discord Profile Card:** Displays the real-time presence payload exactly as it appears on Discord (application icon, name, details, active file/window title, and per-app elapsed timer).
+- **Live Discord Activity Preview:** Visual preview card based on the current ZenRPC presence state/payload (displaying application icon, name, details, active window title/state, and per-app elapsed timer). Note: Discord's native client styles and formats rich presence cards according to its own UI layout and the user's client activity privacy settings.
 - **Discord Connection Status:** Real-time status badge reflecting Discord connectivity (*Connected*, *Reconnecting*, or *RPC Disabled*).
 - **Quick Controls:** One-click toggles for *Enable/Disable RPC*, *Lock/Unlock Presence*, *Reload Config*, and *Minimize to Tray*.
-- **Application Mapping Manager:** Easily view built-in and custom rules, search processes in real-time, add overrides, edit existing mappings, and remove custom definitions without corrupting default rules. Paginated for high performance.
+- **Application Mapping Manager:** Easily view built-in (read-only) and custom rules, search processes in real-time, add overrides, edit existing mappings, and remove custom definitions without corrupting default rules. Paginated for high performance.
 - **Visual Settings:** Configure your Discord Client ID, adjust presence update interval (with automatic $\ge$ 15s Discord rate-limit clamping), tune reconnect retry delays, and toggle idle/title broadcasting.
-- **Ultra-Lightweight Footprint:** Consumes only **~32 MB** of private anonymous RAM (~55 MB total resident memory including shared X11/Tk libraries). Zero Chromium or Node.js runtime bloat.
+- **Measured Memory Footprint:**
+  - **Private Anonymous Memory (`RssAnon`):** **~32–37 MB** (actual heap and Python objects allocated specifically by the GUI).
+  - **Total Process Memory (`VmRSS`):** **~55–62 MB** (comprising ~32–37 MB private anonymous heap + ~23–25 MB shared system libraries dynamically mapped by the Linux kernel, including `libc.so`, `libX11.so`, `libtk8.6.so`, and the Python runtime).
+  - *Technical note:* ZenRPC does not label the GUI total footprint as "<50 MB" because total process `VmRSS` measures ~55–62 MB at runtime, while the application's own private heap footprint is ~32–37 MB. Both figures represent a fraction of the resource requirements of Electron (250–500 MB) or PyQt6 (90–120 MB).
 - **Window Lifecycle & Tray Integration:** Minimizes seamlessly to the system tray upon clicking the close button (`[X]`). Capability-based fallback gracefully handles desktop environments without tray watchers (such as default GNOME Shell or minimal Wayland sessions).
 
 ### Launch Modes & CLI Flags
