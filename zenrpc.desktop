@@ -2,7 +2,10 @@
 Type=Application
 Name=ZenRPC
 Comment=Discord Rich Presence for active window
-Exec=python3 main.py
+Exec=sh -c "\"\\$(dirname \"%k\")/run.sh\""
+# Optional: Set absolute Path and Exec if copying to ~/.local/share/applications/
+# Path=/path/to/ZenRPC
+# Exec=/path/to/ZenRPC/run.sh
 Icon=discord
 Terminal=false
 Categories=Utility;

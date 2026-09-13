@@ -1,6 +1,11 @@
 import json
 import os
+import signal
+import subprocess
+import sys
 import tempfile
+import time
+import pytest
 from app.config import DEFAULT_CONFIG, get_config_path, load_config, save_config
 
 
@@ -92,6 +97,75 @@ def test_cwd_independence(tmp_path):
         assert default_path.endswith("config.json")
     finally:
         os.chdir(original_cwd)
+
+
+def test_external_cwd_subprocess_resolution(tmp_path):
+    """Invoking config resolution via Python subprocess from external CWD resolves to repo config."""
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    expected_config_path = os.path.join(repo_root, "config.json")
+
+    cmd = [
+        sys.executable,
+        "-c",
+        "import sys; sys.path.insert(0, sys.argv[1]); from app.config import get_config_path; print(get_config_path())",
+        repo_root,
+    ]
+    res = subprocess.run(
+        cmd,
+        cwd=str(tmp_path),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    resolved_path = res.stdout.strip()
+    assert os.path.samefile(resolved_path, expected_config_path)
+
+
+def test_run_sh_script_cwd_independence(tmp_path):
+    """run.sh launcher resolves repository root correctly from an external working directory."""
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    run_sh = os.path.join(repo_root, "run.sh")
+    assert os.path.isfile(run_sh)
+    assert os.access(run_sh, os.X_OK)
+
+    res = subprocess.run(
+        ["bash", "-c", f'APP_DIR="$(cd "$(dirname "{run_sh}")" && pwd)" && echo "$APP_DIR"'],
+        cwd=str(tmp_path),
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    resolved_dir = res.stdout.strip()
+    assert os.path.samefile(resolved_dir, repo_root)
+
+
+def test_run_sh_execution_from_external_cwd(tmp_path):
+    """Invoking run.sh from an external working directory starts up and shuts down cleanly."""
+    if not os.environ.get("DISPLAY"):
+        pytest.skip("DISPLAY not set; skipping live launcher execution test")
+
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    run_sh = os.path.join(repo_root, "run.sh")
+    assert os.path.isfile(run_sh)
+    assert os.access(run_sh, os.X_OK)
+
+    proc = subprocess.Popen(
+        [run_sh],
+        cwd=str(tmp_path),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    try:
+        time.sleep(0.8)
+        assert proc.poll() is None, f"run.sh exited prematurely: {proc.stderr.read()}"
+        proc.send_signal(signal.SIGTERM)
+        proc.communicate(timeout=5)
+        assert proc.returncode == 0
+    except Exception:
+        proc.kill()
+        raise
+
 
 
 def test_custom_mappings_merge_user_and_defaults():

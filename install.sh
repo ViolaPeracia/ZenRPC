@@ -21,10 +21,12 @@ else
     echo "  [OK] config.json already exists."
 fi
 
+chmod +x run.sh
+
 echo ""
 echo "========================================================"
 echo " Installation complete!"
 echo " 1. Edit config.json and enter your Discord client_id."
-echo " 2. Run with: python3 main.py"
+echo " 2. Run with: ./run.sh (or python3 main.py)"
 echo "========================================================"
 echo ""
