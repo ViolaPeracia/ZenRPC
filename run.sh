@@ -12,7 +12,9 @@ if [ -d "$HOME/.local/lib" ]; then
     export LD_LIBRARY_PATH="$HOME/.local/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 fi
 
-if [ -x "$APP_DIR/.venv/bin/python" ]; then
+if [ -n "$VIRTUAL_ENV" ] && [ -x "$VIRTUAL_ENV/bin/python" ]; then
+    PYTHON="$VIRTUAL_ENV/bin/python"
+elif [ -x "$APP_DIR/.venv/bin/python" ]; then
     PYTHON="$APP_DIR/.venv/bin/python"
 elif command -v python3 &>/dev/null; then
     PYTHON="python3"
