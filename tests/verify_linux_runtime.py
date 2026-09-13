@@ -101,17 +101,13 @@ class X11WindowManager:
         time.sleep(0.1)
 
     def activate(self, window):
-        net_active_window = self.d.intern_atom("_NET_ACTIVE_WINDOW")
-        event = protocol.event.ClientMessage(
-            window=window,
-            client_type=net_active_window,
-            data=(32, [1, X.CurrentTime, 0, 0, 0]),
-        )
-        self.root.send_event(
-            event, event_mask=X.SubstructureRedirectMask | X.SubstructureNotifyMask
-        )
         try:
-            window.set_input_focus(X.RevertToParent, X.CurrentTime)
+            subprocess.run(
+                ["xdotool", "windowactivate", str(window.id)],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=2,
+            )
         except Exception:
             pass
         self.d.sync()
@@ -247,7 +243,7 @@ def verify_unicode_titles(wm: X11WindowManager, win):
     logger.info("=== Check 3: Multibyte Unicode Window Titles ===")
     unicode_title = "Dự án ZenRPC 🚀"
     wm.set_title(win, unicode_title)
-    time.sleep(0.3)
+    wm.activate(win)
 
     proc_name, title = get_active_window_info()
     assert (
@@ -257,10 +253,6 @@ def verify_unicode_titles(wm: X11WindowManager, win):
         title == unicode_title
     ), f"Expected title {unicode_title!r}, got {title!r}"
     logger.info("✓ PASS: Multibyte Unicode title verified: '%s'", title)
-
-    # Restore title for PresenceEngine test
-    wm.set_title(win, "VS Code Window")
-    time.sleep(0.3)
 
 
 def verify_presence_engine_timer_and_switch(
@@ -282,9 +274,8 @@ def verify_presence_engine_timer_and_switch(
     assert connected is True, "Expected engine.connect() to succeed"
     assert mock_rpc.connected is True, "Expected mock_rpc.connected to be True"
 
-    # Set Window A title
-    wm.set_title(win_a, "VS Code Window")
-    time.sleep(0.3)
+    # Window A is active with Unicode title from Check 3
+    wm.activate(win_a)
     engine.update_once()
 
     assert len(mock_rpc.updates) == 1, (
@@ -293,7 +284,7 @@ def verify_presence_engine_timer_and_switch(
     first_update = mock_rpc.updates[0]
     initial_start_ts = first_update["start"]
     assert initial_start_ts == engine.current_proc_start_time
-    assert first_update["state"] == "VS Code Window"
+    assert first_update["state"] == "Dự án ZenRPC 🚀"
     logger.info(
         "✓ Initial presence set: app=%s, start=%d, state='%s'",
         engine.current_proc,
@@ -306,7 +297,7 @@ def verify_presence_engine_timer_and_switch(
 
     # Title-only change on Window A
     wm.set_title(win_a, "VS Code Window - modified")
-    time.sleep(0.3)
+    wm.activate(win_a)
     engine.update_once()
 
     assert len(mock_rpc.updates) == 2, (
