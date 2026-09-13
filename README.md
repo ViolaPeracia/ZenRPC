@@ -208,7 +208,7 @@ ZenRPC includes 144 built-in recognition rules covering 58 popular desktop appli
 ### 💬 Communication & Collaboration
 | Application | Process Names | Discord Asset Key | Default Activity Text |
 | :--- | :--- | :--- | :--- |
-| **Discord** | `discord.exe`, `discord` | `discord` | Chatting |
+| **Discord** | `discord.exe`, `discord`, `DiscordPTB.exe`, `DiscordPTB` | `discord` | Chatting |
 | **Telegram** | `Telegram.exe`, `telegram-desktop`, `telegram` | `telegram` | Chatting |
 | **Zalo** | `Zalo.exe`, `zalo` | `zalo` | Chatting |
 | **Slack** | `slack.exe`, `slack` | `slack` | Collaborating |

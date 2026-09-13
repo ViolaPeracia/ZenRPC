@@ -295,3 +295,33 @@ def test_windows_terminal_dataflow_and_switch_behavior(mock_win32_env, mock_rpc_
     assert u3["large_text"] == "Windows Terminal"
     assert u3["state"] == "PowerShell 7"
 
+
+def test_discord_ptb_windows_detection_and_mapping(mock_win32_env, mock_rpc_factory, tmp_path):
+    """
+    Verifies that on Windows, detecting DiscordPTB.exe as foreground window
+    points to the standard Discord asset ('discord').
+    """
+    from app.config import save_config
+    cfg_path = str(tmp_path / "config.json")
+    save_config({"client_id": "123456789"}, cfg_path)
+
+    mock_win32_env["process_instance"].name.return_value = "DiscordPTB.exe"
+    mock_win32_env["gui"].GetWindowText.return_value = "#general | My Server - Discord"
+
+    engine = PresenceEngine(
+        config_path=cfg_path,
+        detector_fn=detector.get_active_window_info,
+        rpc_factory=mock_rpc_factory,
+    )
+    assert engine.connect() is True
+    engine.update_once()
+
+    rpc = mock_rpc_factory.instances[0]
+    assert len(rpc.updates) == 1
+    u = rpc.updates[0]
+    assert u["large_image"] == "discord"
+    assert u["large_text"] == "Discord PTB"
+    assert u["details"] == "Chatting"
+    assert u["state"] == "#general | My Server - Discord"
+
+

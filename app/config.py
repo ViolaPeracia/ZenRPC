@@ -61,6 +61,26 @@ DEFAULT_CONFIG = {
             "icon": "discord",
             "detail": "Chatting"
         },
+        "DiscordPTB.exe": {
+            "name": "Discord PTB",
+            "icon": "discord",
+            "detail": "Chatting"
+        },
+        "discordptb.exe": {
+            "name": "Discord PTB",
+            "icon": "discord",
+            "detail": "Chatting"
+        },
+        "DiscordPTB": {
+            "name": "Discord PTB",
+            "icon": "discord",
+            "detail": "Chatting"
+        },
+        "discord-ptb": {
+            "name": "Discord PTB",
+            "icon": "discord",
+            "detail": "Chatting"
+        },
         "notepad.exe": {
             "name": "Notepad",
             "icon": "notepad",

@@ -134,6 +134,21 @@ class PresenceEngine:
             if not mapping and (clean_lower.startswith("gimp-") or clean_lower.startswith("gimp_")):
                 mapping = mappings.get("gimp")
 
+            if not mapping and (clean_lower in ("discordptb", "discord-ptb", "discord_ptb") or clean_lower.startswith("discordptb")):
+                discord_mapping = mappings.get("discord.exe") or mappings.get("discord")
+                if discord_mapping and isinstance(discord_mapping, dict):
+                    mapping = {
+                        "name": "Discord PTB",
+                        "icon": discord_mapping.get("icon", "discord"),
+                        "detail": discord_mapping.get("detail", "Chatting"),
+                    }
+                else:
+                    mapping = {
+                        "name": "Discord PTB",
+                        "icon": "discord",
+                        "detail": "Chatting",
+                    }
+
         if mapping and isinstance(mapping, dict):
             app_name = mapping.get("name") or clean_proc
             detail = mapping.get("detail") or f"Using {app_name}"

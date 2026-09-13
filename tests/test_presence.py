@@ -238,6 +238,9 @@ def test_premigration_process_and_asset_mappings(mock_rpc_factory):
             ("firefox", "firefox", "Firefox", "Browsing"),
             ("discord.exe", "discord", "Discord", "Chatting"),
             ("discord", "discord", "Discord", "Chatting"),
+            ("DiscordPTB.exe", "discord", "Discord PTB", "Chatting"),
+            ("discordptb.exe", "discord", "Discord PTB", "Chatting"),
+            ("DiscordPTB", "discord", "Discord PTB", "Chatting"),
             ("notepad.exe", "notepad", "Notepad", "Writing"),
             ("gedit", "notepad", "Text Editor", "Writing"),
             ("explorer.exe", "explorer", "File Explorer", "Viewing files"),
@@ -481,6 +484,9 @@ def test_expanded_catalog_mappings(mock_rpc_factory):
             ("vivaldi.exe", "vivaldi", "Vivaldi"),
             ("vivaldi", "vivaldi", "Vivaldi"),
             # Communication & Social
+            ("DiscordPTB.exe", "discord", "Discord PTB"),
+            ("discordptb.exe", "discord", "Discord PTB"),
+            ("DiscordPTB", "discord", "Discord PTB"),
             ("Telegram.exe", "telegram", "Telegram"),
             ("telegram-desktop", "telegram", "Telegram"),
             ("telegram", "telegram", "Telegram"),
@@ -608,6 +614,68 @@ def test_art_assets_integrity():
         with Image.open(png_path) as im:
             assert im.size == (512, 512), f"Asset '{icon}.png' dimension is {im.size}, expected (512, 512)"
             assert im.mode == "RGBA", f"Asset '{icon}.png' mode is {im.mode}, expected 'RGBA'"
+
+
+def test_discord_ptb_points_to_normal_discord_asset(mock_rpc_factory, tmp_path):
+    """
+    Verifies that detecting DiscordPTB on Windows resolves to the standard Discord asset ('discord'),
+    both when configured in custom_mappings and when falling back dynamically.
+    """
+    from app.config import save_config
+
+    # 1. Test with default configuration containing explicit DiscordPTB mapping
+    cfg_path = str(tmp_path / "config.json")
+    save_config({"client_id": "123456789"}, cfg_path)
+
+    current_window = ("DiscordPTB.exe", "Discord | #general-chat")
+
+    def mock_detector():
+        return current_window
+
+    engine = PresenceEngine(
+        config_path=cfg_path,
+        detector_fn=mock_detector,
+        rpc_factory=mock_rpc_factory,
+    )
+    assert engine.connect() is True
+    engine.update_once()
+
+    rpc = mock_rpc_factory.instances[0]
+    assert len(rpc.updates) == 1
+    u1 = rpc.updates[0]
+    assert u1["large_image"] == "discord"
+    assert u1["large_text"] == "Discord PTB"
+    assert u1["details"] == "Chatting"
+    assert u1["state"] == "Discord | #general-chat"
+
+    # 2. Test fallback when custom_mappings does not contain DiscordPTB
+    fallback_cfg_path = str(tmp_path / "fallback_config.json")
+    save_config({"client_id": "123456789"}, fallback_cfg_path)
+
+    engine_fallback = PresenceEngine(
+        config_path=fallback_cfg_path,
+        detector_fn=mock_detector,
+        rpc_factory=mock_rpc_factory,
+    )
+    assert engine_fallback.connect() is True
+    # Explicitly isolate custom_mappings to only have discord.exe to test dynamic fallback
+    engine_fallback.config["custom_mappings"] = {
+        "discord.exe": {
+            "name": "Discord",
+            "icon": "discord",
+            "detail": "Chatting with friends"
+        }
+    }
+    engine_fallback.update_once()
+
+    rpc2 = mock_rpc_factory.instances[1]
+    assert len(rpc2.updates) == 1
+    u2 = rpc2.updates[0]
+    assert u2["large_image"] == "discord"
+    assert u2["large_text"] == "Discord PTB"
+    assert u2["details"] == "Chatting with friends"
+    assert u2["state"] == "Discord | #general-chat"
+
 
 
 
