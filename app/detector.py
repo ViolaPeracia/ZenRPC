@@ -131,7 +131,7 @@ def _get_linux_process_name(pid):
                     name = os.path.basename(arg).strip()
                     if name:
                         return name.lower()
-    except (OSError, Exception) as e:
+    except Exception as e:
         logger.debug("Failed reading /proc/%s/cmdline: %s", pid, e)
 
     # Fallback attempt: comm
@@ -140,7 +140,7 @@ def _get_linux_process_name(pid):
             comm = f.read().strip()
             if comm:
                 return comm.lower()
-    except (OSError, Exception) as e:
+    except Exception as e:
         logger.debug("Failed reading /proc/%s/comm: %s", pid, e)
 
     return None
@@ -170,7 +170,7 @@ def _get_active_linux():
     if not proc_name:
         return None, None
 
-    return proc_name, title or ""
+    return proc_name, (title.strip() if title else "")
 
 
 def get_active_window_info():
