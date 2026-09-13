@@ -43,7 +43,7 @@ To display rich presence on Discord, you need a free Discord Application ID:
 
 1. **Clone or download** this repository:
    ```bash
-   git clone https://github.com/githubuser2777/ZenRPC.git
+   git clone https://github.com/ViolaPeracia/ZenRPC.git
    cd ZenRPC
    ```
 2. **Install dependencies:**
@@ -403,7 +403,7 @@ The project follows a disciplined, platform-prioritized development roadmap:
 3. **Optional Cross-Platform Enhancements (Deferred):**
    - **`M4`:** Native Wayland compositor IPC, local privacy filtering, rotating local file logging, and standalone packaging.
 
-For complete roadmap directives and task tracking, see [`docs/ROADMAP.md`](docs/ROADMAP.md) and the [GitHub Milestones](https://github.com/githubuser2777/ZenRPC/milestones).
+For complete roadmap directives and task tracking, see [`docs/ROADMAP.md`](docs/ROADMAP.md) and the [GitHub Milestones](https://github.com/ViolaPeracia/ZenRPC/milestones).
 
 ---
 
