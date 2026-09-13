@@ -24,6 +24,7 @@ Every asset has been independently sourced from official brand repositories, per
 | `zed` | Zed | Zed Industries | `zed-industries/zed` (crates/zed/resources/app-icon.png) | GPL-3.0 / Apache-2.0 |
 | `terminal` | Windows Terminal | Microsoft / Wikimedia Commons | `Windows_Terminal_logo.svg` | MIT / Microsoft |
 | `cursor` | Cursor | Cursor / SVGL Library | `pheralb/svgl` (cursor_dark.svg) | MIT Repo / Cursor Brand |
+| `orca` | Orca | Orca IDE | `orca-ide.png` | Permissive / Proprietary App Icon |
 | `windsurf` | Windsurf IDE | Codeium / SVGL Library | `pheralb/svgl` (windsurf-dark.svg) | MIT Repo / Codeium Brand |
 | `sublime` | Sublime Text | Sublime HQ / Wikimedia Commons | `Antu_sublime-text.svg` | GPLv3 / Sublime HQ |
 | `pycharm` | JetBrains PyCharm | JetBrains / Wikimedia Commons | `PyCharm_Icon.svg` | Apache 2.0 / JetBrains Brand |

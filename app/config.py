@@ -171,6 +171,26 @@ DEFAULT_CONFIG = {
             "icon": "cursor",
             "detail": "Editing code"
         },
+        "Orca.exe": {
+            "name": "Orca",
+            "icon": "orca",
+            "detail": "Developing with Orca"
+        },
+        "orca": {
+            "name": "Orca",
+            "icon": "orca",
+            "detail": "Developing with Orca"
+        },
+        "orca-ide.exe": {
+            "name": "Orca",
+            "icon": "orca",
+            "detail": "Developing with Orca"
+        },
+        "orca-ide": {
+            "name": "Orca",
+            "icon": "orca",
+            "detail": "Developing with Orca"
+        },
         "Windsurf.exe": {
             "name": "Windsurf",
             "icon": "windsurf",
