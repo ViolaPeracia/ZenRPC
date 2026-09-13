@@ -88,6 +88,14 @@ def _get_active_windows():
         return None, None
 
 
+def is_wayland():
+    """Returns True if running in a Wayland session, False otherwise."""
+    return bool(
+        os.environ.get("WAYLAND_DISPLAY")
+        or os.environ.get("XDG_SESSION_TYPE") == "wayland"
+    )
+
+
 def _run_cmd(cmd, timeout=2):
     """Executes a command with strict timeout and captures stdout."""
     try:
@@ -98,7 +106,8 @@ def _run_cmd(cmd, timeout=2):
     except FileNotFoundError:
         global _LINUX_TOOLS_WARNED
         if not _LINUX_TOOLS_WARNED:
-            logger.warning("Required tool '%s' not found on system PATH.", cmd[0])
+            tool_name = cmd[0] if cmd else "command"
+            logger.warning("Required tool '%s' not found on system PATH.", tool_name)
             _LINUX_TOOLS_WARNED = True
         return ""
     except Exception as e:
@@ -108,17 +117,22 @@ def _run_cmd(cmd, timeout=2):
 
 def _get_linux_process_name(pid):
     """Directly reads /proc/<pid>/cmdline or /proc/<pid>/comm without spawning cat."""
+    if pid is None or isinstance(pid, bool) or not isinstance(pid, int) or pid <= 0:
+        return None
+
     # First attempt: cmdline gives full, non-truncated binary name
     try:
         with open(f"/proc/{pid}/cmdline", "rb") as f:
             raw = f.read()
         if raw:
-            first_arg = raw.split(b"\x00")[0].decode(errors="ignore")
-            name = os.path.basename(first_arg).strip()
-            if name:
-                return name.lower()
-    except Exception:
-        pass
+            for part in raw.split(b"\x00"):
+                if part:
+                    arg = part.decode(errors="ignore")
+                    name = os.path.basename(arg).strip()
+                    if name:
+                        return name.lower()
+    except (OSError, Exception) as e:
+        logger.debug("Failed reading /proc/%s/cmdline: %s", pid, e)
 
     # Fallback attempt: comm
     try:
@@ -126,10 +140,10 @@ def _get_linux_process_name(pid):
             comm = f.read().strip()
             if comm:
                 return comm.lower()
-    except Exception:
-        pass
+    except (OSError, Exception) as e:
+        logger.debug("Failed reading /proc/%s/comm: %s", pid, e)
 
-    return "unknown"
+    return None
 
 
 def _get_active_linux():
@@ -139,18 +153,24 @@ def _get_active_linux():
     gracefully returns (None, None).
     """
     win_id = _run_cmd(["xdotool", "getactivewindow"], timeout=2)
-    if not win_id:
+    if not win_id or not win_id.isdigit() or int(win_id) <= 0:
+        if is_wayland():
+            logger.debug(
+                "Wayland session detected and no active X11/XWayland window found; falling back to idle."
+            )
         return None, None
 
     title = _run_cmd(["xdotool", "getwindowname", win_id], timeout=2)
     pid_str = _run_cmd(["xdotool", "getwindowpid", win_id], timeout=2)
 
-    if pid_str and pid_str.isdigit():
-        proc_name = _get_linux_process_name(int(pid_str))
-        return proc_name, title
+    if not pid_str or not pid_str.isdigit() or int(pid_str) <= 0:
+        return None, None
 
-    # Window has no PID (e.g. desktop window or client without _NET_WM_PID)
-    return "unknown", title
+    proc_name = _get_linux_process_name(int(pid_str))
+    if not proc_name:
+        return None, None
+
+    return proc_name, title or ""
 
 
 def get_active_window_info():
